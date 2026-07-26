@@ -1,29 +1,38 @@
-# settings.toml — Minimal application settings for ForecastForge.
+# settings.toml — Base application settings for ForecastForge.
 #
 # This file defines non-secret, environment-agnostic default settings.
-# Secrets and per-environment overrides belong in `.env` (see
-# `.env.example`), never in this file. Settings here are intended to be
-# loaded and validated via a pydantic Settings model once the
-# configuration-loading module is implemented (see roadmap in README.md).
+# It is loaded and merged by `forecastforge.config.settings.Settings`
+# (see src/forecastforge/config/settings.py). Values here are the
+# lowest-priority configuration layer above the field defaults declared
+# on `Settings` itself; they are overridden by the matching
+# `configs/<environment>.toml` overlay, which in turn is overridden by
+# a `.env` file, which in turn is overridden by real environment
+# variables. See docs/development.md for the full precedence order.
+#
+# Secrets must never be placed in this file or its overlays — they
+# belong in environment variables (see `.env.example`).
 
 [project]
 name = "forecastforge"
 environment = "development"
+random_seed = 42
 
 [logging]
-config_path = "configs/logging.yaml"
 level = "INFO"
 
 [paths]
+# Relative paths are resolved against the project root by
+# forecastforge.config.paths.resolve_path; absolute paths are used
+# as-is.
 data_dir = "data"
-raw_dir = "data/raw"
-interim_dir = "data/interim"
-processed_dir = "data/processed"
-external_dir = "data/external"
 models_dir = "models"
+artifacts_dir = "artifacts"
 mlruns_dir = "mlruns"
 
-[pipeline]
-# Placeholder section: pipeline stage toggles will be added once
-# ingestion, feature engineering, and modeling pipelines exist.
-enabled = false
+[defaults]
+asset_symbol = "SPY"
+timeframe = "1d"
+sequence_length = 64
+batch_size = 32
+num_workers = 4
+device_preference = "auto"

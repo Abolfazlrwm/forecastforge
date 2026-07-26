@@ -9,6 +9,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Implemented the application configuration subsystem under
+  `src/forecastforge/config/`: `settings.py` (a `pydantic-settings`
+  `Settings` model with a cached singleton factory), `environment.py`
+  (deployment environment detection), `paths.py` (project-relative path
+  resolution), `runtime.py` (execution-context detection), `device.py`
+  (CPU/CUDA/MPS device detection), and `seed.py` (deterministic seeding
+  for Python, NumPy, and PyTorch, with graceful fallback when the
+  latter two are not installed).
+- Added `pydantic-settings` as a core dependency.
+- Added a `docs/development.md` "Configuration" section documenting the
+  configuration hierarchy, TOML file mechanics, and environment
+  variable overrides.
+- Added a full `tests/config/` suite covering settings loading,
+  environment/TOML/env-var precedence, path resolution, device
+  detection fallback, and seed reproducibility.
+
+### Changed
+
+- Restructured `configs/settings.toml` and its `development.toml` /
+  `testing.toml` / `production.toml` overlays to match the fields the
+  new `Settings` model loads (`[project]`, `[logging]`, `[paths]`,
+  `[defaults]`), removing the unused placeholder `[pipeline]` section.
+- Expanded `.env.example` with the full set of `FORECASTFORGE_*`
+  variables corresponding to `Settings` fields.
+
+### Added (previous phase)
+
 - Expanded `src/forecastforge/` into its full planned subpackage
   structure (`config`, `core`, `common`, `utils`, `data`, `features`,
   `models`, `evaluation`, `tracking`, `serving`, `monitoring`,

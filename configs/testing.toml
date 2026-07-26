@@ -1,10 +1,8 @@
 # testing.toml — Test environment overrides.
 #
-# Values here are merged over `configs/settings.toml` when
-# FORECASTFORGE_ENV=testing (e.g. during `pytest` runs and CI). Only
-# settings that differ from the base defaults are declared. No
-# settings-loading/merging logic is implemented yet (see
-# docs/development.md).
+# Merged over `configs/settings.toml` by `forecastforge.config.settings.Settings`
+# when FORECASTFORGE_ENV=testing (e.g. during `pytest` runs and CI).
+# Only settings that differ from the base defaults are declared here.
 
 [project]
 environment = "testing"
@@ -13,12 +11,9 @@ environment = "testing"
 level = "WARNING"
 
 [paths]
-# Tests should never read or write the developer's real data/model
-# directories; a dedicated, ephemeral location will be used once a
-# settings loader exists.
+# Tests should never read or write a developer's real data/model/
+# artifact directories.
 data_dir = "data/.testing"
 models_dir = "models/.testing"
+artifacts_dir = "artifacts/.testing"
 mlruns_dir = "mlruns/.testing"
-
-[pipeline]
-enabled = false
