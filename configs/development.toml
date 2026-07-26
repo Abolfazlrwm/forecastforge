@@ -1,18 +1,13 @@
 # development.toml — Development environment overrides.
 #
-# Values here are merged over `configs/settings.toml` when
-# FORECASTFORGE_ENV=development. Only settings that differ from the base
-# defaults are declared; anything not listed here inherits from
-# `settings.toml`. No settings-loading/merging logic is implemented yet
-# (see docs/development.md).
+# Merged over `configs/settings.toml` by `forecastforge.config.settings.Settings`
+# when the active environment (FORECASTFORGE_ENV, default "development")
+# resolves to "development". Only settings that differ from the base
+# defaults are declared here; anything not listed inherits from
+# `settings.toml`.
 
 [project]
 environment = "development"
 
 [logging]
 level = "DEBUG"
-
-[pipeline]
-# Development runs are expected to operate against small, local sample
-# data once ingestion exists — kept disabled until then.
-enabled = false
