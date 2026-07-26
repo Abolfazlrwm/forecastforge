@@ -1,0 +1,18 @@
+# production.toml — Production environment overrides.
+#
+# Values here are merged over `configs/settings.toml` when
+# FORECASTFORGE_ENV=production. Only settings that differ from the base
+# defaults are declared. Secrets (credentials, connection strings) must
+# never be placed in this file — they belong in environment variables
+# (see `.env.example`). No settings-loading/merging logic or production
+# deployment exists yet (see docs/development.md).
+
+[project]
+environment = "production"
+
+[logging]
+level = "INFO"
+
+[pipeline]
+# Remains disabled until a pipeline implementation exists to enable.
+enabled = false

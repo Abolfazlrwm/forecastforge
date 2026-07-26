@@ -1,0 +1,29 @@
+# settings.toml — Minimal application settings for ForecastForge.
+#
+# This file defines non-secret, environment-agnostic default settings.
+# Secrets and per-environment overrides belong in `.env` (see
+# `.env.example`), never in this file. Settings here are intended to be
+# loaded and validated via a pydantic Settings model once the
+# configuration-loading module is implemented (see roadmap in README.md).
+
+[project]
+name = "forecastforge"
+environment = "development"
+
+[logging]
+config_path = "configs/logging.yaml"
+level = "INFO"
+
+[paths]
+data_dir = "data"
+raw_dir = "data/raw"
+interim_dir = "data/interim"
+processed_dir = "data/processed"
+external_dir = "data/external"
+models_dir = "models"
+mlruns_dir = "mlruns"
+
+[pipeline]
+# Placeholder section: pipeline stage toggles will be added once
+# ingestion, feature engineering, and modeling pipelines exist.
+enabled = false
