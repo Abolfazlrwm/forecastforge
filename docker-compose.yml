@@ -1,0 +1,51 @@
+# docker-compose.yml — ForecastForge local development stack (PLACEHOLDER)
+#
+# No services are implemented yet. This file exists to reserve the
+# project's container orchestration layout so contributors know where
+# service definitions will live once ingestion, model training, tracking,
+# and serving components are built.
+#
+# Anticipated future services (NOT yet implemented):
+#   - app:        The ForecastForge API / serving container.
+#   - mlflow:      Experiment tracking server backed by the `mlruns/` store
+#                  (or an external backend, once decided via an ADR).
+#   - db:          Metadata / feature store backing database.
+#   - worker:      Background/batch pipeline execution (ingestion, training).
+#
+# When these services are implemented, each should:
+#   - Build from a Dockerfile under `docker/<service-name>/Dockerfile`.
+#   - Read configuration from environment variables documented in
+#     `.env.example`.
+#   - Mount `data/` and `mlruns/` as volumes rather than baking data into
+#     images.
+#
+# version key intentionally omitted: the Compose Specification no longer
+# requires it (https://docs.docker.com/compose/compose-file/) and modern
+# Docker Compose CLIs ignore/warn on it.
+
+services: {}
+# services:
+#   app:
+#     build:
+#       context: .
+#       dockerfile: docker/app/Dockerfile
+#     env_file:
+#       - .env
+#     volumes:
+#       - ./data:/app/data
+#       - ./models:/app/models
+#     ports:
+#       - "8000:8000"
+#
+#   mlflow:
+#     build:
+#       context: .
+#       dockerfile: docker/mlflow/Dockerfile
+#     volumes:
+#       - ./mlruns:/mlruns
+#     ports:
+#       - "5000:5000"
+
+networks:
+  default:
+    name: forecastforge-network
