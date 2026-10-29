@@ -281,18 +281,17 @@ for the (currently skeletal) extended development guide.
 | Phase | Scope | Status |
 |-------|-------|--------|
 | 0 | Repository foundation, package structure, tooling, CI, OSS hygiene | ✅ Completed |
-| 1 | Configuration & logging framework implementation | ✅ Completed |
-| 2 | Data ingestion interfaces and connectors | ✅ Completed |
-| 3 | Feature engineering framework | ⏳ Planned |
-| 4 | Model training & evaluation framework | ⏳ Planned |
-| 5 | Experiment tracking & model registry integration | ⏳ Planned |
-| 6 | Serving layer / inference API | ⏳ Planned |
-| 7 | Containerized deployment & orchestration | ⏳ Planned |
-| 8 | Observability, alerting, and SLOs | ⏳ Planned |
+| 1 | Data layer — schemas, validation, DataSource protocol, synthetic generator, file loaders, optional YFinance connector | ✅ Completed |
+| 2 | Feature engineering framework | ⏳ Planned |
+| 3 | Model training & evaluation framework | ⏳ Planned |
+| 4 | Experiment tracking & model registry integration | ⏳ Planned |
+| 5 | Serving layer / inference API | ⏳ Planned |
+| 6 | Containerized deployment & orchestration | ⏳ Planned |
+| 7 | Observability, alerting, and SLOs | ⏳ Planned |
 
 This roadmap will evolve; significant architectural choices will be
 captured as ADRs under [`docs/adr/`](docs/adr/) as they are made.
-**Phases 0–2 are completed. Phases 3 and beyond are planned.**
+**Phases 0–1 are completed. Phases 2 and beyond are planned.**
 
 ## Contributing
 
