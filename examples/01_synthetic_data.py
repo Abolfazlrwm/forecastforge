@@ -13,6 +13,8 @@ Install the optional dependencies first::
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from forecastforge.data import SyntheticConfig, SyntheticSource
 
 
@@ -80,7 +82,11 @@ def _plot(ts) -> None:
     ax_volume.set_xlabel("Date")
 
     plt.tight_layout()
-    plt.show()
+
+    out_path = Path(__file__).resolve().parents[1] / "docs" / "assets" / "synthetic_spy_demo.png"
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig(out_path, dpi=150, bbox_inches="tight")
+    print(f"Plot saved to: {out_path}")
 
 
 if __name__ == "__main__":
