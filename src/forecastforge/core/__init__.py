@@ -1,6 +1,21 @@
 """Core domain types, interfaces, and shared abstractions.
 
-This package will define the cross-cutting contracts (protocols, base
-classes, exceptions) that other ForecastForge packages depend on. No
-domain logic is implemented yet.
+Currently provides the exception hierarchy every other subpackage raises
+from; see :mod:`forecastforge.core.errors`.
 """
+
+from __future__ import annotations
+
+from forecastforge.core.errors import (
+    DataError,
+    DataValidationError,
+    ForecastForgeError,
+    MissingOptionalDependencyError,
+)
+
+__all__ = [
+    "DataError",
+    "DataValidationError",
+    "ForecastForgeError",
+    "MissingOptionalDependencyError",
+]

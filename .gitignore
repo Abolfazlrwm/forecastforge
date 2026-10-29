@@ -63,16 +63,18 @@ htmlcov/
 
 # ---------------------------------------------------------------------------
 # Project data & artifacts (never commit local data or run outputs)
+# Anchored to the repo root so package dirs like src/forecastforge/data and
+# src/forecastforge/models stay tracked while the runtime cache stays ignored.
 # ---------------------------------------------------------------------------
-data/
-!data/raw/.gitkeep
-!data/interim/.gitkeep
-!data/processed/.gitkeep
-!data/external/.gitkeep
-mlruns/
-!mlruns/.gitkeep
-models/
-!models/.gitkeep
+/data/
+!/data/raw/.gitkeep
+!/data/interim/.gitkeep
+!/data/processed/.gitkeep
+!/data/external/.gitkeep
+/mlruns/
+!/mlruns/.gitkeep
+/models/
+!/models/.gitkeep
 
 # ---------------------------------------------------------------------------
 # Model / experiment artifact file types
