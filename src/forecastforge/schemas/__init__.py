@@ -1,6 +1,19 @@
-"""Data and configuration schema definitions.
+"""Data and configuration schemas.
 
-This package will hold shared schema and type definitions (e.g. pydantic
-models) used to validate data and configuration across ForecastForge. No
-schema definitions are implemented yet.
+Currently provides the validated time-series container
+(:class:`~forecastforge.schemas.time_series.TimeSeries`) and the structural
+validation it enforces (:mod:`forecastforge.schemas.validation`).
 """
+
+from __future__ import annotations
+
+from forecastforge.schemas.time_series import TimeSeries, TimeSeriesMetadata
+from forecastforge.schemas.validation import Gap, find_gaps, validate_frame
+
+__all__ = [
+    "Gap",
+    "TimeSeries",
+    "TimeSeriesMetadata",
+    "find_gaps",
+    "validate_frame",
+]
