@@ -1,6 +1,6 @@
 # ForecastForge
 
-[![CI](https://github.com/forecastforge/forecastforge/actions/workflows/ci.yml/badge.svg)](https://github.com/forecastforge/forecastforge/actions/workflows/ci.yml)
+[![CI](https://github.com/Abolfazlrwm/forecastforge/actions/workflows/ci.yml/badge.svg)](https://github.com/Abolfazlrwm/forecastforge/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://www.python.org/downloads/)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-261230.svg)](https://github.com/astral-sh/ruff)
@@ -226,7 +226,7 @@ What does **not** exist yet (by design, for this phase):
 
 ```bash
 # Clone the repository
-git clone https://github.com/forecastforge/forecastforge.git
+git clone https://github.com/Abolfazlrwm/forecastforge.git
 cd forecastforge
 
 # One-shot environment setup: creates a venv, installs the package and

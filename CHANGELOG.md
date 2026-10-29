@@ -80,5 +80,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `docker/`, `scripts/`, `data/{raw,interim,processed,external}/`,
   `models/`, and `mlruns/`.
 
-[Unreleased]: https://github.com/forecastforge/forecastforge/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/forecastforge/forecastforge/releases/tag/v0.1.0
+[Unreleased]: https://github.com/Abolfazlrwm/forecastforge/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/Abolfazlrwm/forecastforge/releases/tag/v0.1.0
