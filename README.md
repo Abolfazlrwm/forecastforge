@@ -1,6 +1,6 @@
 # ForecastForge
 
-[![CI](https://github.com/forecastforge/forecastforge/actions/workflows/ci.yml/badge.svg)](https://github.com/forecastforge/forecastforge/actions/workflows/ci.yml)
+[![CI](https://github.com/Abolfazlrwm/forecastforge/actions/workflows/ci.yml/badge.svg)](https://github.com/Abolfazlrwm/forecastforge/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://www.python.org/downloads/)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-261230.svg)](https://github.com/astral-sh/ruff)
@@ -119,8 +119,11 @@ as each stage is designed) lives in [docs/architecture.md](docs/architecture.md)
 ```
 forecastforge/
 ├── .github/
-│   └── workflows/
-│       └── ci.yml            # Lint, type-check, test on push/PR
+│   ├── workflows/
+│   │   └── ci.yml            # Lint, type-check, test, wheel smoke test
+│   ├── ISSUE_TEMPLATE/        # Bug report and feature request forms
+│   ├── dependabot.yml         # Automated dependency updates
+│   └── pull_request_template.md
 ├── src/
 │   └── forecastforge/         # Installable Python package (src-layout)
 │       ├── config/             # Settings loading & validation (planned)
@@ -200,7 +203,12 @@ This repository is in the **foundation phase**. What exists today:
 - Pre-commit hooks enforcing formatting, linting, and basic file
   hygiene.
 - Continuous integration (`.github/workflows/ci.yml`) running Ruff,
-  MyPy, and pytest on every push and pull request.
+  MyPy, and pytest, then building the wheel and importing it in a clean
+  virtual environment, on every push and pull request.
+- A coverage floor of 85% enforced by pytest; the suite currently covers
+  98% of `src/forecastforge`.
+- Dependabot updates for pip, GitHub Actions, and pre-commit, plus YAML
+  issue forms and a pull request template.
 - A documentation skeleton under `docs/` and a first ADR recording why
   the project uses `src`-layout.
 - Community health files: `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`,
@@ -226,7 +234,7 @@ What does **not** exist yet (by design, for this phase):
 
 ```bash
 # Clone the repository
-git clone https://github.com/forecastforge/forecastforge.git
+git clone https://github.com/Abolfazlrwm/forecastforge.git
 cd forecastforge
 
 # One-shot environment setup: creates a venv, installs the package and
