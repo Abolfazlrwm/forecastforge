@@ -29,13 +29,14 @@ classifiers = [
     "Typing :: Typed",
 ]
 
-# NOTE: This is the repository bootstrap phase. Only the minimal set of
-# dependencies required to install, lint, type-check, and test the package
-# skeleton are declared here. Modeling, feature engineering, and data
-# ingestion dependencies (e.g. pandas, numpy, scikit-learn, mlflow, etc.)
-# are intentionally deferred to later milestones. See docs/adr for the
-# rationale behind incremental dependency adoption.
+# Core runtime dependencies. The data layer makes NumPy and pandas genuine
+# requirements rather than optional extras: every forecasting stage consumes
+# a pandas DataFrame, and pretending otherwise would mean optional-import
+# branches in code that can never actually run without them. Heavier or
+# network-dependent libraries stay behind extras (`data`, `torch`).
 dependencies = [
+    "numpy>=1.26,<3.0",
+    "pandas>=2.2,<3.0",
     "pydantic>=2.7,<3.0",
     "pydantic-settings>=2.2,<3.0",
     "python-dotenv>=1.0,<2.0",
@@ -44,8 +45,16 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# Real market data and the Parquet engine. Kept optional so that a plain
+# `pip install forecastforge` stays small and works fully offline.
+data = [
+    "pyarrow>=15.0",
+    "yfinance>=0.2.40",
+]
 dev = [
     "build>=1.2.0",
+    "pandas-stubs>=2.2",  # pandas does not ship its own type information
+    "pyarrow>=15.0",  # so the Parquet code paths are covered in CI
     "ruff>=0.17.0",
     "mypy>=1.10.0",
     "pytest>=8.2.0",

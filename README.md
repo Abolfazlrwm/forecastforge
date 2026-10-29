@@ -8,13 +8,13 @@
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://www.conventionalcommits.org/en/v1.0.0/)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
 
-> **Status: Pre-Alpha — repository foundation phase.**
+> **Status: Pre-Alpha — repository foundation + data layer phase.**
 > **ForecastForge does not yet implement any machine learning
-> functionality.** No data ingestion, no feature engineering, no model
-> training, no serving, and no monitoring exist yet. This repository
-> currently contains the project scaffolding, package structure,
-> documentation skeleton, CI, and developer tooling on which that
-> functionality will be built.
+> functionality** (feature engineering, model training, serving, or
+> monitoring). The core exception hierarchy, validated ``TimeSeries``
+> container with structural validation, and a fully-offline data
+> ingestion layer (synthetic source, file loaders, and optional Yahoo
+> Finance connector) are implemented and tested.
 
 ## Project Goals
 
@@ -182,48 +182,51 @@ forecastforge/
 └── VERSION                    # Current project version
 ```
 
-Every subpackage under `src/forecastforge/` currently contains only an
-`__init__.py` with a module docstring describing its future
-responsibility — no functionality is implemented in any of them yet.
 
 ## Current Status
 
-This repository is in the **foundation phase**. What exists today:
+This repository is in the **foundation + data layer phase**. What
+exists today:
 
 - A `src`-layout Python package (`forecastforge`) with its full planned
-  subpackage structure stubbed out, and no modeling, feature
-  engineering, or ingestion logic implemented in any of them.
+  subpackage structure. The `core`, `schemas`, and `data` subpackages
+  are implemented; the remaining subpackages (`features`, `models`,
+  `evaluation`, `serving`, `monitoring`, `tracking`) are stubbed and
+  await future phases.
+- **Core exception hierarchy** (`forecastforge.core.errors`) and a
+  **validated ``TimeSeries`` container** (`forecastforge.schemas`) with
+  strict structural validation (sorted ``DatetimeIndex``, numeric/finite
+  columns, optional gap detection).
+- **Data ingestion layer** (`forecastforge.data`):
+  * ``DataSource`` protocol + ``BaseDataSource`` for load → slice →
+    validate → wrap.
+  * Deterministic, fully-seeded **synthetic OHLCV generator**
+    (`SyntheticSource`) used as the default offline dataset.
+  * Optional **Yahoo Finance connector** (`YFinanceSource`) installed
+    via the ``[data]`` extra, lazily imported and cached to Parquet.
+  * CSV and Parquet **file loaders** that preserve a ``DatetimeIndex``.
 - A modern `pyproject.toml`-based build (Hatchling) targeting Python
   3.12+.
-- Linting and formatting via [Ruff](https://github.com/astral-sh/ruff).
-- Static type checking via [MyPy](https://mypy-lang.org/) in strict
+- Linting and formatting via [Ruff](https://github.com/astral-sh/ruff);
+  static type checking via [MyPy](https://mypy-lang.org/) in strict
   mode.
 - A test harness via [pytest](https://docs.pytest.org/) with coverage
-  reporting configured.
-- Pre-commit hooks enforcing formatting, linting, and basic file
-  hygiene.
+  reporting configured. The suite currently covers **96%** of the
+  source tree and enforces an 85% floor.
 - Continuous integration (`.github/workflows/ci.yml`) running Ruff,
   MyPy, and pytest, then building the wheel and importing it in a clean
   virtual environment, on every push and pull request.
-- A coverage floor of 85% enforced by pytest; the suite currently covers
-  98% of `src/forecastforge`.
-- Dependabot updates for pip, GitHub Actions, and pre-commit, plus YAML
-  issue forms and a pull request template.
-- A documentation skeleton under `docs/` and a first ADR recording why
-  the project uses `src`-layout.
-- Community health files: `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`,
-  `SECURITY.md`, `CHANGELOG.md`.
-- Environment-specific configuration overlays (`configs/development.toml`,
-  `configs/testing.toml`, `configs/production.toml`) layered over
-  `configs/settings.toml`.
-- Placeholder Docker build contexts (`docker/app`, `docker/mlflow`,
-  `docker/monitor`) reserving the future service layout.
+- Pre-commit hooks, Dependabot, YAML issue forms, a pull request
+  template, and community health files (`CONTRIBUTING.md`,
+  `CODE_OF_CONDUCT.md`, `SECURITY.md`, `CHANGELOG.md`).
+- Environment-specific configuration overlays
+  (`configs/development.toml`, `configs/testing.toml`,
+  `configs/production.toml`).
 - Bootstrap scripts (`scripts/bootstrap.sh`, `scripts/bootstrap.ps1`)
   automating local environment setup.
 
-What does **not** exist yet (by design, for this phase):
+What does **not** exist yet (by design):
 
-- Data ingestion connectors or schemas.
 - Feature engineering logic.
 - Model training, evaluation, or inference code.
 - A serving/API layer.
@@ -277,9 +280,9 @@ for the (currently skeletal) extended development guide.
 
 | Phase | Scope | Status |
 |-------|-------|--------|
-| 0 | Repository foundation, package structure, tooling, CI, OSS hygiene | ✅ In progress (this phase) |
-| 1 | Configuration & logging framework implementation | ⏳ Planned |
-| 2 | Data ingestion interfaces and connectors | ⏳ Planned |
+| 0 | Repository foundation, package structure, tooling, CI, OSS hygiene | ✅ Completed |
+| 1 | Configuration & logging framework implementation | ✅ Completed |
+| 2 | Data ingestion interfaces and connectors | ✅ Completed |
 | 3 | Feature engineering framework | ⏳ Planned |
 | 4 | Model training & evaluation framework | ⏳ Planned |
 | 5 | Experiment tracking & model registry integration | ⏳ Planned |
@@ -289,7 +292,7 @@ for the (currently skeletal) extended development guide.
 
 This roadmap will evolve; significant architectural choices will be
 captured as ADRs under [`docs/adr/`](docs/adr/) as they are made.
-**No phase beyond Phase 0 has been started.**
+**Phases 0–2 are completed. Phases 3 and beyond are planned.**
 
 ## Contributing
 

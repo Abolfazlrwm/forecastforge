@@ -1,10 +1,20 @@
 """ForecastForge: a production-grade, open-source forecasting platform.
 
-This package is currently in the repository-bootstrap phase. No modeling,
-feature engineering, or data ingestion functionality has been implemented
-yet. This module intentionally exposes only package metadata so that the
-package is importable and its version can be introspected by tooling
-(pip, build backends, CI, documentation generators, etc.).
+Implemented:
+  * Core exception hierarchy and validated ``TimeSeries`` container.
+  * Structural validation (sorted DatetimeIndex, numeric/finite/NaN checks,
+    optional gap detection).
+  * Data ingestion layer: ``DataSource`` protocol, deterministic synthetic
+    OHLCV generator, optional Yahoo Finance connector (cached to Parquet),
+    and CSV/Parquet file loaders.
+
+Still planned:
+  * Feature engineering framework.
+  * Model training, evaluation, and serving layers.
+  * Experiment tracking, monitoring, and containerised deployment.
+
+This module exposes package metadata so that the package is importable and
+its version can be introspected by tooling (pip, build backends, CI, docs).
 """
 
 from __future__ import annotations
