@@ -64,7 +64,11 @@ Issues = "https://github.com/forecastforge/forecastforge/issues"
 Changelog = "https://github.com/forecastforge/forecastforge/blob/main/CHANGELOG.md"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src"]
+# The value must be the importable package directory, not the src root.
+# With "src", hatchling treats src/ as the package itself and archives the
+# files under a src/ prefix inside site-packages, so a non-editable install
+# ships `site-packages/src/forecastforge/` and `import forecastforge` fails.
+packages = ["src/forecastforge"]
 
 # ---------------------------------------------------------------------------
 # Ruff
