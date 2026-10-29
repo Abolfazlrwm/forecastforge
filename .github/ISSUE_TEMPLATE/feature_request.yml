@@ -1,0 +1,71 @@
+name: Feature request
+description: Propose a new capability or an improvement to an existing one.
+title: "feat: <short description of the proposal>"
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the proposal. Please describe the problem before the
+        solution — it makes the trade-offs much easier to evaluate.
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Preflight checks
+      options:
+        - label: I have searched existing issues and this is not a duplicate.
+          required: true
+        - label: I have read the roadmap in the README.
+          required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Describe the situation you are in and why the current behaviour is not enough.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: What would you like ForecastForge to do?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other approaches, including what you currently do instead.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which part of the project does this touch?
+      options:
+        - Data ingestion and schemas
+        - Feature engineering
+        - Models and evaluation
+        - Backtesting
+        - Experiment tracking
+        - Serving API
+        - Monitoring
+        - CLI and pipelines
+        - Packaging, CI, or tooling
+        - Documentation
+        - Not sure
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I would be willing to open a pull request for this.
+          required: false
