@@ -58,10 +58,10 @@ docs = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/forecastforge/forecastforge"
-Repository = "https://github.com/forecastforge/forecastforge"
-Issues = "https://github.com/forecastforge/forecastforge/issues"
-Changelog = "https://github.com/forecastforge/forecastforge/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/Abolfazlrwm/forecastforge"
+Repository = "https://github.com/Abolfazlrwm/forecastforge"
+Issues = "https://github.com/Abolfazlrwm/forecastforge/issues"
+Changelog = "https://github.com/Abolfazlrwm/forecastforge/blob/main/CHANGELOG.md"
 
 [tool.hatch.build.targets.wheel]
 # The value must be the importable package directory, not the src root.

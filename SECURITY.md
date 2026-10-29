@@ -21,7 +21,7 @@ If you believe you have found a security vulnerability in ForecastForge,
 please report it privately using one of the following channels:
 
 1. **GitHub Security Advisories (preferred):** Use the
-   ["Report a vulnerability"](https://github.com/forecastforge/forecastforge/security/advisories/new)
+   ["Report a vulnerability"](https://github.com/Abolfazlrwm/forecastforge/security/advisories/new)
    feature under this repository's Security tab. This creates a private
    advisory visible only to maintainers until it is resolved.
 2. **Email:** If GitHub Security Advisories are unavailable to you,
