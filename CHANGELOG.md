@@ -34,6 +34,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Expanded `.env.example` with the full set of `FORECASTFORGE_*`
   variables corresponding to `Settings` fields.
 
+### Fixed
+
+- Built wheels were not importable. `packages = ["src"]` in
+  `pyproject.toml` archived every module under a `src/` prefix, so a
+  non-editable install placed the code at
+  `site-packages/src/forecastforge/`. Editable installs hid the problem,
+  which is why it survived a green test suite; CI now builds the wheel
+  and imports it in a clean virtual environment.
+- Eleven URLs pointed at `github.com/forecastforge/forecastforge`
+  instead of this repository, breaking the CI badge, the security
+  advisory link, and the package metadata links.
+- Line endings were normalised to LF via `.gitattributes`, so
+  `ruff format --check` no longer fails on a Windows checkout using
+  `core.autocrlf=true`.
+- Optional numpy/PyTorch imports moved into a documented helper
+  (`forecastforge.config._optional`) instead of lazy imports inside
+  functions, removing three PLC0415 violations and the mypy
+  `import-not-found` errors they caused.
+- The coverage gate enforced nothing (`fail_under = 0`); it is now 85,
+  with total coverage at 98%.
+- Pre-commit pinned Ruff v0.5.5 while the lint config still referenced
+  the removed ANN101/ANN102 rules, producing warnings on every run.
+
 ### Added (previous phase)
 
 - Expanded `src/forecastforge/` into its full planned subpackage
