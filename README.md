@@ -119,8 +119,11 @@ as each stage is designed) lives in [docs/architecture.md](docs/architecture.md)
 ```
 forecastforge/
 ├── .github/
-│   └── workflows/
-│       └── ci.yml            # Lint, type-check, test on push/PR
+│   ├── workflows/
+│   │   └── ci.yml            # Lint, type-check, test, wheel smoke test
+│   ├── ISSUE_TEMPLATE/        # Bug report and feature request forms
+│   ├── dependabot.yml         # Automated dependency updates
+│   └── pull_request_template.md
 ├── src/
 │   └── forecastforge/         # Installable Python package (src-layout)
 │       ├── config/             # Settings loading & validation (planned)
@@ -200,7 +203,12 @@ This repository is in the **foundation phase**. What exists today:
 - Pre-commit hooks enforcing formatting, linting, and basic file
   hygiene.
 - Continuous integration (`.github/workflows/ci.yml`) running Ruff,
-  MyPy, and pytest on every push and pull request.
+  MyPy, and pytest, then building the wheel and importing it in a clean
+  virtual environment, on every push and pull request.
+- A coverage floor of 85% enforced by pytest; the suite currently covers
+  98% of `src/forecastforge`.
+- Dependabot updates for pip, GitHub Actions, and pre-commit, plus YAML
+  issue forms and a pull request template.
 - A documentation skeleton under `docs/` and a first ADR recording why
   the project uses `src`-layout.
 - Community health files: `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`,
