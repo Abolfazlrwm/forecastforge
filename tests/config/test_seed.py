@@ -12,19 +12,23 @@ from forecastforge.config.seed import set_seed
 
 
 def test_set_seed_makes_python_random_reproducible() -> None:
+    """Seeding must determine the whole global RNG state, not just a prefix.
+
+    Comparing the generator state is a stronger assertion than comparing a
+    few drawn values: it proves that every subsequent draw is fixed, rather
+    than that the first five happen to match.
+    """
     set_seed(1234)
-    first = [random.random() for _ in range(5)]
+    first = random.getstate()
     set_seed(1234)
-    second = [random.random() for _ in range(5)]
-    assert first == second
+    assert random.getstate() == first
 
 
 def test_set_seed_different_seeds_diverge() -> None:
     set_seed(1)
-    first = [random.random() for _ in range(5)]
+    first = random.getstate()
     set_seed(2)
-    second = [random.random() for _ in range(5)]
-    assert first != second
+    assert random.getstate() != first
 
 
 def test_set_seed_sets_pythonhashseed_env_var() -> None:
