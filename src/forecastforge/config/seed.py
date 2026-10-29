@@ -2,8 +2,9 @@
 
 Seeds Python's :mod:`random` module and, if installed, NumPy and
 PyTorch. Neither NumPy nor PyTorch is a hard dependency of
-ForecastForge at this stage of the project, so both are imported
-lazily and their absence is handled gracefully rather than raising an
+ForecastForge at this stage of the project, so both are resolved
+through :func:`forecastforge.config._optional.optional_import` and their
+absence is handled gracefully rather than raising an
 :class:`ImportError`.
 """
 
@@ -11,6 +12,8 @@ from __future__ import annotations
 
 import os
 import random
+
+from forecastforge.config._optional import optional_import
 
 __all__ = ["set_seed"]
 
@@ -35,16 +38,12 @@ def set_seed(seed: int) -> None:
     os.environ["PYTHONHASHSEED"] = str(seed)
     random.seed(seed)
 
-    try:
-        import numpy as np
-    except ImportError:
-        pass
-    else:
-        np.random.seed(seed)
+    numpy = optional_import("numpy")
+    if numpy is not None:
+        numpy.random.seed(seed)
 
-    try:
-        import torch
-    except ImportError:
+    torch = optional_import("torch")
+    if torch is None:
         return
 
     torch.manual_seed(seed)
