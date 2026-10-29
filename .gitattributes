@@ -1,0 +1,29 @@
+# Line-ending policy.
+#
+# Git normalizes text files to LF in the object database and checks them out
+# with LF in the working tree, overriding any user-level core.autocrlf
+# setting. This keeps the repository byte-identical on Windows, macOS, and
+# Linux, and it is required by tooling that is configured for LF: Ruff's
+# formatter runs with line-ending = "lf", so a CRLF working tree fails
+# `ruff format --check` even when the committed blobs are already correct.
+* text=auto eol=lf
+
+# Binary assets must never be normalized: doing so corrupts them.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.gz binary
+*.tar binary
+*.npy binary
+*.npz binary
+*.parquet binary
+*.pkl binary
+*.joblib binary
+*.pt binary
+*.pth binary
+*.onnx binary
+*.mlmodel binary
