@@ -17,18 +17,32 @@ By participating in this project, you agree to abide by the
 
 ## Branching Strategy
 
-- `main` is the trunk branch and is always expected to be releasable:
-  CI (`.github/workflows/ci.yml`) must pass on every commit to `main`.
-- All work happens on short-lived feature branches created from `main`,
-  named descriptively with a type prefix, e.g.:
-  - `feat/data-ingestion-interfaces`
+ForecastForge uses a two-tier branch model:
+
+- `main` is the release trunk. It only ever contains code that has been
+  reviewed, has a green CI run, and is considered releasable. It is
+  updated exclusively by merging `develop` (or a hotfix branch) through
+  a pull request.
+- `develop` is the integration branch. It is the default target for
+  feature work and is expected to be green at all times.
+- All work happens on short-lived topic branches created from `develop`,
+  named with a type prefix, e.g.:
+  - `feature/data-ingestion-interfaces`
   - `fix/logging-config-path`
   - `docs/architecture-diagram`
   - `chore/bump-ruff`
-- Branches are merged into `main` via pull request. Direct pushes to
-  `main` are discouraged even for maintainers.
-- Rebase your branch on the latest `main` before opening a pull request
-  to minimize merge conflicts and keep history readable.
+  - `refactor/config-sources`
+
+Topic branches are merged into `develop` via pull request. Direct pushes
+to either `main` or `develop` are discouraged, even for maintainers.
+History is never rewritten on shared branches: no force-pushes and no
+rebasing of published commits.
+
+### Promotion to `main`
+
+When `develop` reaches a coherent milestone, it is merged into `main`
+through a pull request, `VERSION` is bumped, `CHANGELOG.md` is updated,
+and an annotated `vX.Y.Z` tag is created on the merge commit.
 
 ## Commit Convention
 
@@ -74,7 +88,7 @@ explaining the impact.
 
 Before opening a pull request, please confirm:
 
-- [ ] The branch is up to date with `main`.
+- [ ] The branch is up to date with `develop` and targets `develop`.
 - [ ] `make lint` passes with no errors.
 - [ ] `make format` has been run (code is Ruff-formatted).
 - [ ] `make typecheck` passes with no MyPy errors.

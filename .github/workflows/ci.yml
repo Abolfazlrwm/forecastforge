@@ -2,17 +2,16 @@ name: CI
 
 # Continuous integration for ForecastForge.
 #
-# Scope is intentionally limited to repository-foundation quality gates:
-# installing the package, linting, type-checking, and testing. No Docker
-# builds, no model training, and no deployment happen in this workflow —
-# those will be added in later phases as the corresponding functionality
-# is implemented.
+# One job, by design: the gates are cheap and sequential, so splitting them
+# across a matrix would add wall-clock time without adding signal. A second
+# job will be introduced only when a genuinely slow stage (Docker builds,
+# training runs) needs to be parallelised.
 
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   pull_request:
-    branches: [main]
+    branches: [main, develop]
   workflow_dispatch: {}
 
 concurrency:
@@ -22,9 +21,12 @@ concurrency:
 permissions:
   contents: read
 
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+
 jobs:
   quality:
-    name: Lint, type-check, and test
+    name: Lint, type-check, test, and package
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -38,11 +40,10 @@ jobs:
           python-version: "3.12"
           cache: "pip"
 
-      - name: Install package
-        run: python -m pip install --upgrade pip && pip install -e .
-
-      - name: Install dev dependencies
-        run: pip install -e ".[dev]"
+      - name: Install package with dev dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
 
       - name: Lint with Ruff
         run: ruff check .
@@ -55,3 +56,41 @@ jobs:
 
       - name: Test with pytest
         run: pytest
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-xml
+          path: coverage.xml
+          if-no-files-found: ignore
+          retention-days: 7
+
+      # The gates above run against an editable install, which maps src/ onto
+      # sys.path and therefore cannot detect a broken wheel layout. This step
+      # builds the real distribution and imports it from a clean environment.
+      - name: Build wheel
+        run: python -m build --wheel --outdir dist
+
+      - name: Install the wheel into a clean venv and import it
+        run: |
+          python -m venv /tmp/wheel-check
+          /tmp/wheel-check/bin/python -m pip install --upgrade pip
+          /tmp/wheel-check/bin/python -m pip install dist/*.whl
+          # Run from a neutral directory so the checked-out source tree
+          # cannot shadow the installed package.
+          cd /tmp
+          /tmp/wheel-check/bin/python - <<'PY'
+          import forecastforge
+          from forecastforge.config import DeviceType, get_settings, set_seed
+
+          assert forecastforge.__version__, "package version is not exposed"
+          settings = get_settings()
+          set_seed(settings.random_seed)
+          assert settings.resolved_device() in {
+              DeviceType.CPU,
+              DeviceType.CUDA,
+              DeviceType.MPS,
+          }
+          print(f"wheel import OK: {forecastforge.__file__}")
+          PY

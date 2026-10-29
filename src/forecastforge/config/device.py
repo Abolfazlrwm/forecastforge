@@ -3,9 +3,9 @@
 Provides a backend-agnostic abstraction over the compute devices
 ForecastForge may eventually run on (CPU, NVIDIA CUDA, Apple MPS)
 without requiring any specific ML framework to be installed at this
-stage of the project. PyTorch is treated as an optional, lazily
-imported dependency: if it is not installed, detection gracefully
-falls back to CPU rather than raising an error.
+stage of the project. PyTorch is treated as an optional dependency: if
+it is not installed, detection gracefully falls back to CPU rather than
+raising an error.
 
 This module performs *detection* only — it does not construct or
 configure any model, tensor, or training component.
@@ -15,6 +15,8 @@ from __future__ import annotations
 
 from enum import StrEnum
 from functools import lru_cache
+
+from forecastforge.config._optional import optional_import
 
 __all__ = ["DeviceType", "detect_device", "resolve_device"]
 
@@ -47,9 +49,8 @@ def detect_device() -> DeviceType:
     ``detect_device.cache_clear()`` (e.g. in tests) to force
     re-detection.
     """
-    try:
-        import torch
-    except ImportError:
+    torch = optional_import("torch")
+    if torch is None:
         return DeviceType.CPU
 
     if torch.cuda.is_available():
