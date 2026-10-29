@@ -139,5 +139,5 @@ def test_resolved_device_delegates_to_device_module(monkeypatch: pytest.MonkeyPa
 
 def test_settings_is_immutable() -> None:
     settings = Settings()
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="frozen"):
         settings.app_name = "mutated"  # type: ignore[misc]
