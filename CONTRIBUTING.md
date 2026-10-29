@@ -4,11 +4,11 @@ Thank you for your interest in contributing to ForecastForge. This
 document describes the conventions and workflow used to keep the
 project consistent and maintainable across many contributors.
 
-> **Note on current scope:** ForecastForge is in its repository
-> foundation phase. Data ingestion, feature engineering, and model
-> training are not yet implemented. Early contributions are expected to
-> focus on tooling, documentation, and infrastructure rather than ML
-> functionality, unless a maintainer indicates otherwise in an issue.
+> **Note on current scope:** Phases 0 (repository foundation) and 1
+> (data layer, schemas, and validation) are completed and merged to
+> `main`. Phase 2 (feature engineering) is in progress. See the
+> [Roadmap Summary](README.md#roadmap-summary) in `README.md` for the
+> full plan.
 
 ## Code of Conduct
 
@@ -40,9 +40,22 @@ rebasing of published commits.
 
 ### Promotion to `main`
 
-When `develop` reaches a coherent milestone, it is merged into `main`
-through a pull request, `VERSION` is bumped, `CHANGELOG.md` is updated,
-and an annotated `vX.Y.Z` tag is created on the merge commit.
+When `develop` reaches a coherent milestone (the end of a numbered
+phase), it is merged into `main` through a pull request. The merge is a
+**regular merge commit** (not a squash) so that every phase commit is
+preserved on `main` for bisectability and history clarity.
+
+Release cadence:
+1. Feature branches are created from `develop`, reviewed via PR, and
+   merged into `develop`.
+2. At the end of each phase, open a PR `develop -> main` titled
+   `chore(release): <phase description>`.
+3. Wait for CI green on the PR, then merge with a merge commit.
+4. `main` must never lag behind `develop` by more than one phase.
+
+`VERSION` is bumped, `CHANGELOG.md` is updated, and an annotated
+`vX.Y.Z` tag is created on the merge commit as part of the release
+process.
 
 ## Commit Convention
 
