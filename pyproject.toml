@@ -179,5 +179,5 @@ exclude_lines = [
     "raise NotImplementedError",
     "def __repr__",
 ]
-fail_under = 0
+fail_under = 85
 show_missing = true

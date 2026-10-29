@@ -68,3 +68,10 @@ def test_get_configs_dir_points_at_configs_directory() -> None:
     configs_dir = paths.get_configs_dir()
     assert configs_dir == paths.get_project_root() / "configs"
     assert (configs_dir / "settings.toml").is_file()
+
+
+def test_artifact_directory_helpers_point_at_their_directories() -> None:
+    root = paths.get_project_root()
+    assert paths.get_models_dir() == root / "models"
+    assert paths.get_artifacts_dir() == root / "artifacts"
+    assert paths.get_mlruns_dir() == root / "mlruns"
