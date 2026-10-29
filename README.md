@@ -233,6 +233,38 @@ What does **not** exist yet (by design):
 - Monitoring or alerting logic.
 - Built Docker images (Dockerfiles are placeholders only).
 
+## What works today
+
+ForecastForge is not yet a forecasting engine, but the **data foundation is
+real, tested, and runnable**. The demo below uses the deterministic synthetic
+generator (`SyntheticSource`) to produce a ~2-year daily OHLCV series for a
+ticker, validates it through the `TimeSeries` container, and plots it with the
+optional `[viz]` extra.
+
+Run it yourself (after installing the optional visualization dependency):
+
+```bash
+pip install -e ".[viz]"
+python examples/01_synthetic_data.py
+```
+
+The script validates the generated frame into a `TimeSeries` and writes its
+plot to `docs/assets/synthetic_spy_demo.png`:
+
+![Synthetic SPY demo — ~2 years of deterministically generated daily OHLCV](docs/assets/synthetic_spy_demo.png)
+
+This demo exercises **only** the capabilities implemented so far:
+
+- **Data generation** — a fully-seeded, reproducible synthetic OHLCV source.
+- **Validation** — every generated frame is parsed into a validated `TimeSeries`
+  (sorted `DatetimeIndex`, finite numeric columns).
+- **Loading** — the same `TimeSeries` round-trips through the CSV and Parquet
+  file loaders without loss of structure.
+
+Everything beyond data generation, validation, and loading (feature
+engineering, models, evaluation, serving, monitoring — phases 2–9) is planned
+and not yet implemented.
+
 ## Development Workflow
 
 ```bash
@@ -280,18 +312,20 @@ for the (currently skeletal) extended development guide.
 
 | Phase | Scope | Status |
 |-------|-------|--------|
-| 0 | Repository foundation, package structure, tooling, CI, OSS hygiene | ✅ Completed |
+| 0 | Repository health — tooling, CI, packaging, docs, OSS hygiene | ✅ Completed |
 | 1 | Data layer — schemas, validation, DataSource protocol, synthetic generator, file loaders, optional YFinance connector | ✅ Completed |
 | 2 | Feature engineering framework | ⏳ Planned |
-| 3 | Model training & evaluation framework | ⏳ Planned |
-| 4 | Experiment tracking & model registry integration | ⏳ Planned |
-| 5 | Serving layer / inference API | ⏳ Planned |
-| 6 | Containerized deployment & orchestration | ⏳ Planned |
-| 7 | Observability, alerting, and SLOs | ⏳ Planned |
+| 3 | Models + evaluation framework | ⏳ Planned |
+| 4 | CLI / pipeline orchestration | ⏳ Planned |
+| 5 | Experiment tracking & model registry integration | ⏳ Planned |
+| 6 | Serving layer / inference API | ⏳ Planned |
+| 7 | Containerized deployment & orchestration | ⏳ Planned |
+| 8 | Observability, alerting, and SLOs | ⏳ Planned |
+| 9 | Showcase, documentation, and community onboarding | ⏳ Planned |
 
 This roadmap will evolve; significant architectural choices will be
 captured as ADRs under [`docs/adr/`](docs/adr/) as they are made.
-**Phases 0–1 are completed. Phases 2 and beyond are planned.**
+**Phases 0–1 are completed. Phases 2–9 are planned.**
 
 ## Contributing
 
