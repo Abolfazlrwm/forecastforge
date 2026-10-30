@@ -1,11 +1,10 @@
 """Deterministic random seed configuration for ForecastForge.
 
-Seeds Python's :mod:`random` module and, if installed, NumPy and
-PyTorch. Neither NumPy nor PyTorch is a hard dependency of
-ForecastForge at this stage of the project, so both are resolved
-through :func:`forecastforge.config._optional.optional_import` and their
-absence is handled gracefully rather than raising an
-:class:`ImportError`.
+Seeds Python's :mod:`random` module, NumPy's global generator, and PyTorch's
+CPU, CUDA, and MPS generators. NumPy is a core dependency; PyTorch is
+optional, so it is resolved through
+:func:`forecastforge.config._optional.optional_import` and its absence is
+handled gracefully rather than raising an :class:`ImportError`.
 """
 
 from __future__ import annotations
