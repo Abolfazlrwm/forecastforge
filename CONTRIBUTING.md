@@ -4,11 +4,11 @@ Thank you for your interest in contributing to ForecastForge. This
 document describes the conventions and workflow used to keep the
 project consistent and maintainable across many contributors.
 
-> **Note on current scope:** Phases 0 (repository foundation) and 1
-> (data layer, schemas, and validation) are completed and merged to
-> `main`. Phase 2 (feature engineering) is in progress. See the
-> [Roadmap Summary](README.md#roadmap-summary) in `README.md` for the
-> full plan.
+> **Note on current scope:** Phases 0 (repository foundation), 1 (data
+> layer, schemas, and validation), and 2 (feature engineering) are
+> completed and merged to `main`. Phase 3 (models and evaluation) is next.
+> See the [Roadmap Summary](README.md#roadmap-summary) in `README.md` for
+> the full plan.
 
 ## Code of Conduct
 
