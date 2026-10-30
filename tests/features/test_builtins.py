@@ -20,6 +20,7 @@ from forecastforge.features import (
     Lag,
     Returns,
     RollingStat,
+    Transform,
     Volatility,
 )
 from forecastforge.schemas.time_series import TimeSeries, TimeSeriesMetadata
@@ -36,9 +37,9 @@ def _series(values: list[float]) -> TimeSeries:
     )
 
 
-def _column(transform: object, series: TimeSeries, index: int = 0) -> np.ndarray:
+def _column(transform: Transform, series: TimeSeries, index: int = 0) -> np.ndarray:
     """Apply ``transform`` and return the ``index``-th feature column as floats."""
-    features = transform.apply(FeatureSet.from_time_series(series))  # type: ignore[attr-defined]
+    features = transform.apply(FeatureSet.from_time_series(series))
     return features.matrix.iloc[:, index].to_numpy(dtype="float64")
 
 
