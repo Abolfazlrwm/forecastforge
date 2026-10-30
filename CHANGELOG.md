@@ -41,6 +41,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `Regime` now changes the process rather than the price level. It gains a
+  `volatility_shift` field, and `level_shift` is off by default and opt-in.
+  Previously `level_shift` injected an additive shock into a single log
+  return, producing a one-day jump of `exp(level_shift) - 1` (7–11% in the
+  demo series) and a flat 20-row plateau in any rolling volatility series
+  containing that row. Series generated without regimes are bit-for-bit
+  unchanged.
 - Restructured `configs/settings.toml` and its `development.toml` /
   `testing.toml` / `production.toml` overlays to match the fields the
   new `Settings` model loads (`[project]`, `[logging]`, `[paths]`,
