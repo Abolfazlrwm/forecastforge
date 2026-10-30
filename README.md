@@ -8,13 +8,13 @@
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://www.conventionalcommits.org/en/v1.0.0/)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
 
-> **Status: Pre-Alpha — repository foundation + data layer phase.**
-> **ForecastForge does not yet implement any machine learning
-> functionality** (feature engineering, model training, serving, or
-> monitoring). The core exception hierarchy, validated ``TimeSeries``
-> container with structural validation, and a fully-offline data
-> ingestion layer (synthetic source, file loaders, and optional Yahoo
-> Finance connector) are implemented and tested.
+> **Status: Pre-Alpha — foundation, data layer, and feature engineering.**
+> **ForecastForge does not yet implement model training, evaluation,
+> serving, or monitoring.** What exists and is tested: the core exception
+> hierarchy, a validated ``TimeSeries`` container with structural
+> validation, a fully-offline data ingestion layer (synthetic source, file
+> loaders, and optional Yahoo Finance connector), and a leakage-safe
+> feature engineering framework.
 
 ## Project Goals
 
@@ -58,10 +58,9 @@ scale. Concretely, the project is working toward:
 
 ## Architecture Overview
 
-The diagram below shows the **intended target architecture**. It
-describes where functionality will live once implemented — it does not
-describe anything that exists in the codebase today. Every stage other
-than the package/tooling scaffold itself is currently unimplemented.
+The diagram below shows the **target architecture** and marks which stages
+exist today. Ingestion and feature engineering are implemented and tested;
+model training, tracking, serving, and monitoring are still planned.
 
 ```mermaid
 flowchart TD
@@ -69,7 +68,7 @@ flowchart TD
         A[Raw & External Data]
     end
 
-    subgraph pipeline["ForecastForge Pipeline (not yet implemented)"]
+    subgraph pipeline["ForecastForge Pipeline"]
         B["Ingestion<br/>(forecastforge.data)"]
         C["Feature Engineering<br/>(forecastforge.features)"]
         D["Model Training & Evaluation<br/>(forecastforge.models,<br/>forecastforge.evaluation)"]
@@ -77,7 +76,7 @@ flowchart TD
         F["Serving / Inference API<br/>(forecastforge.serving)"]
     end
 
-    subgraph ops["Operations (not yet implemented)"]
+    subgraph ops["Operations"]
         G["Monitoring<br/>(forecastforge.monitoring)"]
     end
 
@@ -86,8 +85,10 @@ flowchart TD
     F --> G
     G -. feedback .-> B
 
+    classDef implemented fill:#e6f2e6,stroke:#2e7d32,stroke-width:2px,color:#1b5e20;
     classDef planned fill:#f5f5f5,stroke:#999,stroke-dasharray: 4 3,color:#555;
-    class B,C,D,E,F,G planned;
+    class B,C implemented;
+    class D,E,F,G planned;
 ```
 
 Design principles guiding future implementation phases:
@@ -130,8 +131,8 @@ forecastforge/
 │       ├── core/                # Shared domain types & interfaces (planned)
 │       ├── common/              # Cross-cutting, dependency-light helpers (planned)
 │       ├── utils/                # General-purpose utility functions (planned)
-│       ├── data/                  # Data ingestion & access layer (planned)
-│       ├── features/               # Feature engineering framework (planned)
+│       ├── data/                  # Data ingestion & access layer
+│       ├── features/               # Leakage-safe feature engineering
 │       ├── models/                  # Model definitions & training (planned)
 │       ├── evaluation/               # Model evaluation & metrics (planned)
 │       ├── tracking/                  # Experiment tracking integration (planned)
@@ -185,12 +186,12 @@ forecastforge/
 
 ## Current Status
 
-This repository is in the **foundation + data layer phase**. What
-exists today:
+This repository is in the **feature engineering phase**. What exists
+today:
 
 - A `src`-layout Python package (`forecastforge`) with its full planned
-  subpackage structure. The `core`, `schemas`, and `data` subpackages
-  are implemented; the remaining subpackages (`features`, `models`,
+  subpackage structure. The `core`, `schemas`, `data`, and `features`
+  subpackages are implemented; the remaining subpackages (`models`,
   `evaluation`, `serving`, `monitoring`, `tracking`) are stubbed and
   await future phases.
 - **Core exception hierarchy** (`forecastforge.core.errors`) and a
@@ -205,6 +206,20 @@ exists today:
   * Optional **Yahoo Finance connector** (`YFinanceSource`) installed
     via the ``[data]`` extra, lazily imported and cached to Parquet.
   * CSV and Parquet **file loaders** that preserve a ``DatetimeIndex``.
+- **Feature engineering framework** (`forecastforge.features`):
+  * ``FeatureSet`` — a container that keeps the strict index and target
+    guarantees of ``TimeSeries`` while allowing NaN in generated columns,
+    and reports the warm-up period as an explicit row count.
+  * ``Transform`` base class with a checked contract: a transform declares
+    the columns it produces and ``apply`` verifies them on every call.
+  * Seven causal transforms — lags, rolling statistics, simple and log
+    returns, annualised volatility, RSI, MACD, and calendar features with
+    cyclic sine/cosine encodings.
+  * ``FeaturePipeline`` for ordered composition, where later steps consume
+    columns created by earlier ones.
+  * A leakage test suite that truncates and perturbs the future for every
+    transform, and is itself tested against three deliberately leaky
+    implementations.
 - A modern `pyproject.toml`-based build (Hatchling) targeting Python
   3.12+.
 - Linting and formatting via [Ruff](https://github.com/astral-sh/ruff);
@@ -226,7 +241,6 @@ exists today:
 
 What does **not** exist yet (by design):
 
-- Feature engineering logic.
 - Model training, evaluation, or inference code.
 - A serving/API layer.
 - Monitoring or alerting logic.
@@ -260,9 +274,40 @@ This demo exercises **only** the capabilities implemented so far:
 - **Loading** — the same `TimeSeries` round-trips through the CSV and Parquet
   file loaders without loss of structure.
 
-Everything beyond data generation, validation, and loading (feature
-engineering, models, evaluation, serving, monitoring — phases 2–9) is planned
-and not yet implemented.
+### Feature engineering
+
+The second demo runs a `FeaturePipeline` over that same series. Each transform
+is causal — the value at any row is computed only from rows at or before it —
+and the pipeline reports how many leading rows are still warming up:
+
+```bash
+python examples/02_features.py
+```
+
+```text
+Feature columns: 13
+Warm-up rows  : 33 of 504
+Usable rows   : 471 (93% of the series)
+Complete      : True
+```
+
+The figure below is produced by that command. The shaded band is the warm-up
+region: 33 rows where MACD's two smoothing stages have not yet accumulated
+enough history, so no model may use them.
+
+![Leakage-safe features on the synthetic series: price with a 20-day rolling mean, RSI(14), MACD with signal and histogram, and annualised 20-day volatility](docs/assets/feature_overview.png)
+
+What this demo demonstrates:
+
+- **Lags, rolling statistics, returns, volatility, RSI, MACD, and calendar
+  features** — thirteen columns, all causal.
+- **Explicit warm-up** — `FeatureSet.warmup` counts the unusable prefix
+  instead of hiding it behind a fill or a silent row drop.
+- **Verified leakage safety** — a dedicated test suite truncates and perturbs
+  the future for every transform and asserts the past never changes.
+
+Everything beyond feature engineering (models, evaluation, serving,
+monitoring — phases 3–9) is planned and not yet implemented.
 
 ## Development Workflow
 
@@ -313,7 +358,7 @@ for the (currently skeletal) extended development guide.
 |-------|-------|--------|
 | 0 | Repository health — tooling, CI, packaging, docs, OSS hygiene | ✅ Completed |
 | 1 | Data layer — schemas, validation, DataSource protocol, synthetic generator, file loaders, optional YFinance connector | ✅ Completed |
-| 2 | Feature engineering framework | ⏳ Planned |
+| 2 | Feature engineering framework — `FeatureSet`, causal transforms, pipeline, leakage tests | ✅ Completed |
 | 3 | Models + evaluation framework | ⏳ Planned |
 | 4 | CLI / pipeline orchestration | ⏳ Planned |
 | 5 | Experiment tracking & model registry integration | ⏳ Planned |
@@ -324,7 +369,7 @@ for the (currently skeletal) extended development guide.
 
 This roadmap will evolve; significant architectural choices will be
 captured as ADRs under [`docs/adr/`](docs/adr/) as they are made.
-**Phases 0–1 are completed. Phases 2–9 are planned.**
+**Phases 0–2 are completed. Phases 3–9 are planned.**
 
 ## Contributing
 
