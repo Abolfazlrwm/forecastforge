@@ -31,12 +31,15 @@ if TYPE_CHECKING:
 # ``matplotlib`` package does not expose ``pyplot``.
 _PYPLOT = optional_import("matplotlib.pyplot")
 
-# Regimes that produce visible structural breaks in the synthetic series.
-# They are chosen so the shaded spans are wide enough to read on the plot.
+# Regimes that change the process — drift and volatility — without a price
+# jump, so the path stays continuous and derived volatility has no artefacts.
 _DEMO_REGIMES: tuple[Regime, ...] = (
-    Regime(at=126, level_shift=-0.08, drift_shift=-0.0004),  # ~6 months in: correction
-    Regime(at=252, level_shift=0.10, drift_shift=0.0006),  # ~12 months in: recovery + uptrend
-    Regime(at=378, drift_shift=-0.0002),  # ~18 months in: cooling
+    # ~6 months in: a correction — negative drift, higher volatility.
+    Regime(at=126, drift_shift=-0.0006, volatility_shift=0.008),
+    # ~12 months in: recovery — positive drift, calmer.
+    Regime(at=252, drift_shift=0.0006, volatility_shift=-0.006),
+    # ~18 months in: a turbulent plateau — no trend change, more volatility.
+    Regime(at=378, drift_shift=-0.0002, volatility_shift=0.010),
 )
 
 
