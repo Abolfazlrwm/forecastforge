@@ -112,8 +112,8 @@ Design principles guiding future implementation phases:
   [0001-use-src-layout.md](docs/adr/0001-use-src-layout.md) for the
   first example.
 
-Full architectural documentation (currently a skeleton, to be filled in
-as each stage is designed) lives in [docs/architecture.md](docs/architecture.md).
+Full architectural documentation, including which stages are implemented,
+lives in [docs/architecture.md](docs/architecture.md).
 
 ## Repository Layout
 
@@ -127,10 +127,10 @@ forecastforge/
 │   └── pull_request_template.md
 ├── src/
 │   └── forecastforge/         # Installable Python package (src-layout)
-│       ├── config/             # Settings loading & validation (planned)
-│       ├── core/                # Shared domain types & interfaces (planned)
-│       ├── common/              # Cross-cutting, dependency-light helpers (planned)
-│       ├── utils/                # General-purpose utility functions (planned)
+│       ├── config/             # Settings loading & validation
+│       ├── core/                # Shared domain types & interfaces
+│       ├── common/              # Cross-cutting helpers (placeholder)
+│       ├── utils/                # General-purpose utilities (placeholder)
 │       ├── data/                  # Data ingestion & access layer
 │       ├── features/               # Leakage-safe feature engineering
 │       ├── models/                  # Model definitions & training (planned)
@@ -139,7 +139,7 @@ forecastforge/
 │       ├── serving/                    # Inference API layer (planned)
 │       ├── monitoring/                  # Runtime & model monitoring (planned)
 │       ├── pipelines/                    # Pipeline orchestration (planned)
-│       └── schemas/                       # Shared data/config schemas (planned)
+│       └── schemas/                       # Shared data/config schemas
 ├── tests/                     # Automated test suite (pytest)
 ├── docs/                      # Project documentation
 │   ├── architecture.md

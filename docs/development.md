@@ -20,9 +20,8 @@ until the corresponding functionality exists.
 ## Configuration
 
 ForecastForge's configuration system lives entirely under
-`src/forecastforge/config/` and is the dependency every future
-component (ingestion, features, models, serving, monitoring) will read
-settings from. This section describes how it works today.
+`src/forecastforge/config/` and is the dependency every other component
+reads settings from. This section describes how it works today.
 
 ### Configuration Hierarchy
 
@@ -146,8 +145,9 @@ The `config` package also provides several utilities that sit alongside
   installed. `Settings.resolved_device()` is a convenience wrapper that
   resolves `settings.device_preference` this way.
 - **`forecastforge.config.seed`** — `set_seed(seed)` seeds Python's
-  `random`, and NumPy and PyTorch if they happen to be installed
-  (neither is a hard dependency yet).
+  `random` module, NumPy's global RNG, and PyTorch's CPU/CUDA/MPS
+  generators. NumPy is a core dependency; PyTorch is optional and is
+  skipped when absent.
 
 ## Planned Contents
 
@@ -160,8 +160,8 @@ corresponding functionality exists:
 - **Running the quality gates** — detailed usage of `make lint`,
   `make format`, `make typecheck`, `make test`, and `make run-precommit`,
   including how to interpret common failures.
-- **Working with data locally** — once ingestion exists, how to point
-  ForecastForge at sample or local datasets under `data/`.
+- **Working with data locally** — how to point ForecastForge at sample or
+  local datasets under `data/`.
 - **Debugging and profiling** — recommended tools and workflows once
   pipeline and model code exist.
 - **Release process** — how versions are cut, how `CHANGELOG.md` is
