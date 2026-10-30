@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Implemented the feature engineering framework under
+  `src/forecastforge/features/`: a `FeatureSet` container, a `Transform`
+  base class with a checked output contract, seven causal transforms
+  (lags, rolling statistics, simple and log returns, annualised
+  volatility, RSI, MACD, and calendar features with cyclic encodings),
+  and an ordered `FeaturePipeline`.
+- Added `tests/features/`, including a leakage suite that truncates and
+  perturbs the future for every transform and is itself verified against
+  three deliberately leaky implementations.
+- Added `examples/02_features.py`, which builds thirteen features on the
+  deterministic synthetic series and writes
+  `docs/assets/feature_overview.png`.
+- Rewrote `docs/feature-engineering.md` to document the implemented
+  design, and added a feature-engineering section to the README.
 - Implemented the application configuration subsystem under
   `src/forecastforge/config/`: `settings.py` (a `pydantic-settings`
   `Settings` model with a cached singleton factory), `environment.py`
