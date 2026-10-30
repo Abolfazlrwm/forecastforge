@@ -139,6 +139,11 @@ def test_applying_the_same_transform_twice_is_rejected(counting_series: TimeSeri
         Lag(2).apply(features)
 
 
+def test_non_dataframe_payload_is_rejected() -> None:
+    with pytest.raises(DataValidationError, match="pandas DataFrame"):
+        FeatureSet(frame={"close": [1.0]}, target="close", features=(), metadata=_metadata())  # type: ignore[arg-type]
+
+
 def test_duplicate_column_names_are_rejected() -> None:
     frame = _frame([1.0, 2.0, 3.0])
     frame["shadow"] = frame["close"]
