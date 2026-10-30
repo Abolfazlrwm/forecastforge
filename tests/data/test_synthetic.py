@@ -67,6 +67,55 @@ def test_level_shift_creates_jump() -> None:
     assert ratio > 1.3  # exp(0.5) ~= 1.65
 
 
+def test_regime_without_level_shift_keeps_the_path_continuous() -> None:
+    # Zero noise and zero seasonality make every one-day return exactly the
+    # drift in force at that row, so a jump would show up as a spike.
+    config = SyntheticConfig(
+        length=400,
+        seed=5,
+        drift=0.0,
+        volatility=0.0,
+        seasonality_amplitude=0.0,
+        regimes=(Regime(at=200, drift_shift=0.002),),
+    )
+    close = SyntheticSource(config=config).fetch(symbol="SPY").target_series.to_numpy()
+    returns = close[1:] / close[:-1] - 1.0
+
+    # returns[i] is the move into row i + 1, so the regime first shows at 199.
+    np.testing.assert_allclose(returns[:199], 0.0, atol=1e-12)
+    np.testing.assert_allclose(returns[199:], np.expm1(0.002), atol=1e-12)
+
+
+def test_regime_can_change_volatility() -> None:
+    config = SyntheticConfig(
+        length=1000,
+        seed=8,
+        drift=0.0,
+        volatility=0.004,
+        seasonality_amplitude=0.0,
+        regimes=(Regime(at=500, volatility_shift=0.012),),
+    )
+    close = SyntheticSource(config=config).fetch(symbol="SPY").target_series.to_numpy()
+    returns = close[1:] / close[:-1] - 1.0
+
+    calm = returns[50:450].std()
+    turbulent = returns[550:950].std()
+    # 0.004 -> 0.016 is a four-fold increase in the per-period standard
+    # deviation; the sample estimate should land well above a doubling.
+    assert turbulent > calm * 2.0
+
+
+def test_negative_volatility_from_a_regime_is_rejected() -> None:
+    config = SyntheticConfig(
+        length=100,
+        seed=1,
+        volatility=0.01,
+        regimes=(Regime(at=50, volatility_shift=-0.02),),
+    )
+    with pytest.raises(DataError, match="volatility became negative"):
+        SyntheticSource(config=config).fetch(symbol="SPY")
+
+
 def test_drift_shift_changes_path() -> None:
     baseline = _close(SyntheticSource(config=SyntheticConfig(seed=11)))
     shifted = _close(
