@@ -211,8 +211,7 @@ exists today:
   static type checking via [MyPy](https://mypy-lang.org/) in strict
   mode.
 - A test harness via [pytest](https://docs.pytest.org/) with coverage
-  reporting configured. The suite currently covers **96%** of the
-  source tree and enforces an 85% floor.
+  reporting configured and enforced at an 85% floor.
 - Continuous integration (`.github/workflows/ci.yml`) running Ruff,
   MyPy, and pytest, then building the wheel and importing it in a clean
   virtual environment, on every push and pull request.
@@ -251,7 +250,7 @@ python examples/01_synthetic_data.py
 The script validates the generated frame into a `TimeSeries` and writes its
 plot to `docs/assets/synthetic_spy_demo.png`:
 
-![Synthetic SPY demo — ~2 years of deterministically generated daily OHLCV](docs/assets/synthetic_spy_demo.png)
+![Synthetic asset (SPY-like) - 504 days of deterministically generated daily OHLCV with regime shading](docs/assets/synthetic_spy_demo.png)
 
 This demo exercises **only** the capabilities implemented so far:
 
