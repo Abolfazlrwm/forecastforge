@@ -62,11 +62,33 @@ contributor's laptop.
 
 ### Regimes
 
-A `Regime` marks a structural break at a given row. By default it changes
-**drift and volatility only**; it does not create a one-day price jump, which
-would look like a data error and would poison any volatility window that
-straddles it. `level_shift` is available for callers who deliberately want a
-discontinuous jump.
+A `Regime` marks a structural break at a given row, inclusive:
+
+| Field | Effect from `at` onward |
+|---|---|
+| `drift_shift` | Additive change to the per-period log-return |
+| `volatility_shift` | Additive change to the per-period log-return standard deviation |
+| `level_shift` | Opt-in one-period jump of `exp(level_shift) - 1` in the close price |
+
+By default a regime changes the **process, not the price level**. That choice
+is deliberate:
+
+- A sudden 8% overnight move is indistinguishable from a data error, and a
+  reader of the demo plot reasonably concludes the generator is broken.
+- A single outlier return stays inside every rolling volatility window that
+  contains it for the entire window length, so a 20-day volatility series
+  shows a flat 20-row plateau. That plateau is an artefact of the injected
+  jump, not a property of the process, and it silently contaminates any
+  volatility feature computed from the series.
+
+The volatility of each period is therefore a vector rather than a scalar: a
+regime scales the noise, and the price path stays continuous. `level_shift`
+remains available for callers who explicitly want a discontinuity — for
+example to test how a model copes with a gap.
+
+The resulting per-period standard deviation must stay non-negative; a
+`volatility_shift` that would drive it below zero raises `DataError` rather
+than silently producing NaN prices.
 
 ## Staging conventions
 

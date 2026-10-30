@@ -44,9 +44,9 @@ _PYPLOT = optional_import("matplotlib.pyplot")
 _SEED = 2024
 _LENGTH = 504
 _REGIMES: tuple[Regime, ...] = (
-    Regime(at=126, level_shift=-0.08, drift_shift=-0.0004),
-    Regime(at=252, level_shift=0.10, drift_shift=0.0006),
-    Regime(at=378, drift_shift=-0.0002),
+    Regime(at=126, drift_shift=-0.0006, volatility_shift=0.008),
+    Regime(at=252, drift_shift=0.0006, volatility_shift=-0.006),
+    Regime(at=378, drift_shift=-0.0002, volatility_shift=0.010),
 )
 
 # Order matters: the volatility step reads the return column created above it.

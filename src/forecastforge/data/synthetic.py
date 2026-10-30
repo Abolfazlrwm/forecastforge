@@ -10,7 +10,15 @@ The model is a log-price random walk with:
 * a constant per-period drift (trend),
 * sinusoidal seasonality,
 * gaussian noise, and
-* optional regime changes (sudden level shifts and/or sustained drift shifts).
+* optional regimes that change the drift and/or the volatility from a given
+  row onward.
+
+Regimes deliberately do **not** create a one-day price jump by default. A
+sudden 8% overnight move is indistinguishable from a data error, and a single
+outlier return sits inside every rolling volatility window that straddles it
+for the whole window length, producing a flat plateau that looks like a
+modelling artefact. Callers who genuinely want a discontinuity can ask for
+one with :attr:`Regime.level_shift`.
 """
 
 from __future__ import annotations
@@ -31,19 +39,36 @@ _DEFAULT_COLUMNS = ("open", "high", "low", "close", "volume")
 
 @dataclass(frozen=True, slots=True)
 class Regime:
-    """A structural break applied at a specific position in the series.
+    """A structural break that takes effect at a specific row.
+
+    By default a regime changes the *process*, not the price level: drift and
+    volatility shift from ``at`` onward, so the path stays continuous and only
+    its statistical character changes. That is what a real regime change looks
+    like, and it keeps derived volatility estimates free of artificial spikes.
 
     Attributes:
-        at: Zero-based index where the regime takes effect. Negative values
-            count from the end of the series.
-        level_shift: One-time additive jump in log-price applied at ``at``.
-        drift_shift: Sustained additive change to the per-period log-return
-            applied from ``at`` onward.
+        at: Zero-based index where the regime takes effect, inclusive.
+            Negative values count from the end of the series.
+        drift_shift: Additive change to the per-period log-return, applied
+            from ``at`` onward.
+        volatility_shift: Additive change to the per-period log-return
+            standard deviation, applied from ``at`` onward. The resulting
+            standard deviation must stay non-negative.
+        level_shift: Opt-in one-period jump in log-price at ``at``, producing
+            a discontinuity of ``exp(level_shift) - 1`` in the close price.
+            Off by default; see the module docstring for why.
+
+    Example:
+        A correction at row 126 — lower drift and higher volatility, with no
+        price jump::
+
+            Regime(at=126, drift_shift=-0.0004, volatility_shift=0.006)
     """
 
     at: int
-    level_shift: float = 0.0
     drift_shift: float = 0.0
+    volatility_shift: float = 0.0
+    level_shift: float = 0.0
 
 
 @dataclass(frozen=True, slots=True)
@@ -93,28 +118,45 @@ def _build_frame(config: SyntheticConfig) -> pd.DataFrame:
 
     t = np.arange(n)
     seasonal = config.seasonality_amplitude * np.sin(2.0 * np.pi * t / config.seasonality_period)
-    noise = rng.normal(0.0, config.volatility, size=n)
-    log_returns = np.full(n, config.drift) + seasonal + noise
+
+    # The per-period volatility is a vector rather than a scalar so that a
+    # regime can change it without introducing a jump: the noise is scaled,
+    # the price path stays continuous.
+    sigma = np.full(n, config.volatility)
+    log_returns = np.full(n, config.drift) + seasonal
 
     for regime in config.regimes:
         pos = regime.at if regime.at >= 0 else n + regime.at
         if not 0 <= pos < n:
             raise DataError(f"regime at={regime.at} is out of range for length {n}")
+        if regime.drift_shift:
+            log_returns[pos:] += regime.drift_shift
+        if regime.volatility_shift:
+            sigma[pos:] += regime.volatility_shift
         if regime.level_shift:
+            # Explicitly opt-in discontinuity; see the module docstring.
             log_returns[pos] += regime.level_shift
-        if regime.drift_shift and pos + 1 < n:
-            log_returns[pos + 1 :] += regime.drift_shift
+
+    if (sigma < 0.0).any():
+        first_bad = int(np.argmax(sigma < 0.0))
+        raise DataError(
+            f"volatility became negative at row {first_bad} "
+            f"({sigma[first_bad]:.6f}); volatility_shift values must keep "
+            f"the per-period standard deviation non-negative"
+        )
+
+    log_returns += rng.standard_normal(n) * sigma
 
     log_price = np.log(config.initial_price) + np.cumsum(log_returns)
     close = np.exp(log_price)
 
-    intraday = rng.normal(0.0, config.volatility * 0.5, size=n)
+    intraday = rng.standard_normal(n) * (sigma * 0.5)
     open_ = np.empty(n)
     open_[0] = config.initial_price * np.exp(intraday[0])
     open_[1:] = close[:-1] * np.exp(intraday[1:])
 
-    upper = np.abs(rng.normal(0.0, config.volatility * 0.6, size=n))
-    lower = np.abs(rng.normal(0.0, config.volatility * 0.6, size=n))
+    upper = np.abs(rng.standard_normal(n) * (sigma * 0.6))
+    lower = np.abs(rng.standard_normal(n) * (sigma * 0.6))
     high = np.maximum(open_, close) * np.exp(upper)
     low = np.minimum(open_, close) * np.exp(-lower)
 
