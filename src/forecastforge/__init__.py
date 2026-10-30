@@ -7,9 +7,11 @@ Implemented:
   * Data ingestion layer: ``DataSource`` protocol, deterministic synthetic
     OHLCV generator, optional Yahoo Finance connector (cached to Parquet),
     and CSV/Parquet file loaders.
+  * Feature engineering: ``FeatureSet`` container, causal transforms (lags,
+    rolling statistics, returns, volatility, RSI, MACD, calendar features),
+    and an ordered ``FeaturePipeline`` with a leakage test suite.
 
 Still planned:
-  * Feature engineering framework.
   * Model training, evaluation, and serving layers.
   * Experiment tracking, monitoring, and containerised deployment.
 
