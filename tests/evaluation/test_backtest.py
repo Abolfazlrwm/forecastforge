@@ -172,6 +172,123 @@ def test_gap_embargoes_rows_between_the_training_window_and_the_origin() -> None
     assert folds[0].n_train == 3
 
 
+# -- gap semantics ---------------------------------------------------------
+#
+# The gap is the one part of the fold layout that is easy to get subtly wrong,
+# so its contract is pinned by four properties rather than left implicit in
+# the slicing: the origin does not move, a supervised pair is legal only when
+# its target ends by the origin, a gap shorter than the horizon is exactly
+# where naive pairing leaks, and the scored rows are identical for any gap.
+
+
+def _pair_targets(fold: Fold, horizon: int, *, causal: bool) -> list[int]:
+    """Return the target indices a supervised model would train on.
+
+    A model that respects the horizon stops its last target at ``train_end``
+    (the last row the fold may see). A model with the classic off-by-horizon
+    bug keeps feature rows up to ``train_end`` and reads targets ``horizon``
+    further, so its last target is ``train_end + horizon``.
+
+    Args:
+        fold: The fold whose history the model is fitted on.
+        horizon: Forecast horizon, i.e. how far ahead each target sits.
+        causal: Whether to use the horizon-respecting rule.
+
+    Returns:
+        The target indices, in order.
+    """
+    last = fold.train_end if causal else fold.train_end + horizon
+    return list(range(horizon, last + 1))
+
+
+def assert_training_targets_are_causal(targets: list[int], origin: int) -> None:
+    """Fail unless every training target is at or before the forecast origin.
+
+    Args:
+        targets: Target indices used during training.
+        origin: The fold's forecast origin.
+
+    Raises:
+        AssertionError: If any target lies after the origin.
+    """
+    past = [target for target in targets if target > origin]
+    assert not past, f"training targets past the origin {origin}: {past}"
+
+
+def test_gap_keeps_the_forecast_origin_fixed() -> None:
+    """The gap shortens the training window; it never moves the origin."""
+    base = WalkForwardBacktester(BacktestConfig(initial_train=10, gap=0)).folds(25)
+    gapped = WalkForwardBacktester(BacktestConfig(initial_train=10, gap=3)).folds(25)
+    assert [fold.origin for fold in base] == [fold.origin for fold in gapped]
+    assert [fold.train_end for fold in gapped] == [fold.origin - 3 for fold in gapped]
+    assert {fold.gap for fold in gapped} == {3}
+
+
+def test_a_training_row_is_legal_only_if_its_target_ends_by_the_origin() -> None:
+    """A pair ``(row i, target i + h)`` is legal only when ``i + h + gap <= origin``.
+
+    The backtester hands each model a history ending at ``origin - gap``, so
+    the last legal pair row is ``origin - gap - h``. Stating that bound with
+    equality on the last legal row is what makes the invariant testable.
+    """
+    config = BacktestConfig(initial_train=12, horizon=3, gap=2)
+    folds = WalkForwardBacktester(config).folds(40)
+    assert folds, "the fixture must produce at least one fold"
+    for fold in folds:
+        targets = _pair_targets(fold, config.horizon, causal=True)
+        assert_training_targets_are_causal(targets, fold.origin)
+        last_row = targets[-1] - config.horizon
+        assert last_row >= fold.train_start
+        assert last_row + config.horizon + fold.gap == fold.origin
+
+
+def test_a_gap_shorter_than_the_horizon_is_where_naive_pairing_leaks() -> None:
+    """With ``gap < h``, the naive off-by-horizon rule trains past the origin.
+
+    This is the failure the horizon rule prevents: the last ``h - gap`` target
+    indices fall after the origin, i.e. into the future the model is asked to
+    predict. The audit must reject them.
+    """
+    horizon = 3
+    config = BacktestConfig(initial_train=10, horizon=horizon, gap=1)
+    fold = WalkForwardBacktester(config).folds(30)[0]
+    assert config.gap < horizon
+
+    causal = _pair_targets(fold, horizon, causal=True)
+    assert_training_targets_are_causal(causal, fold.origin)
+
+    leaky = _pair_targets(fold, horizon, causal=False)
+    with pytest.raises(AssertionError, match="past the origin"):
+        assert_training_targets_are_causal(leaky, fold.origin)
+    leaked = [target for target in leaky if target > fold.origin]
+    assert len(leaked) == horizon - config.gap
+
+
+def test_gap_changes_the_training_window_but_not_the_scored_rows(
+    synthetic_close: pd.Series,
+) -> None:
+    """The same folds score the same timestamps and outcomes for any gap.
+
+    Only the training window moves, so the comparison across gaps is honest:
+    the models are judged on identical targets.
+    """
+    base = WalkForwardBacktester(BacktestConfig(initial_train=60, step=10, gap=0)).run(
+        synthetic_close, {"naive": Naive()}
+    )
+    gapped = WalkForwardBacktester(BacktestConfig(initial_train=60, step=10, gap=4)).run(
+        synthetic_close, {"naive": Naive()}
+    )
+    assert base.folds == gapped.folds
+    pd.testing.assert_series_equal(
+        base.predictions["timestamp"].reset_index(drop=True),
+        gapped.predictions["timestamp"].reset_index(drop=True),
+    )
+    pd.testing.assert_series_equal(
+        base.predictions["y_true"].reset_index(drop=True),
+        gapped.predictions["y_true"].reset_index(drop=True),
+    )
+
+
 def test_folds_are_skipped_when_the_training_window_cannot_scale_mase() -> None:
     # A seasonal period of 5 needs more than 5 training rows, so the first
     # origin (5 rows) is skipped and the layout starts one row later.
