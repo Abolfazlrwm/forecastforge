@@ -55,6 +55,13 @@ data = [
 viz = [
     "matplotlib>=3.8.0",
 ]
+# The non-baseline forecasters. Both are heavyweight and platform-sensitive,
+# so they stay out of the core install; the models themselves import cleanly
+# without them and raise a message naming this extra when constructed.
+models = [
+    "statsmodels>=0.14.0",
+    "lightgbm>=4.3.0",
+]
 dev = [
     "build>=1.2.0",
     "pandas-stubs>=2.2",  # pandas does not ship its own type information
