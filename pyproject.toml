@@ -51,9 +51,11 @@ data = [
     "pyarrow>=15.0",
     "yfinance>=0.2.40",
 ]
-# Plotting support for the example scripts and notebooks.
+# Plotting support for the example scripts, notebooks, and the benchmark
+# figure. The floor is 3.9 because the benchmark uses Axes.boxplot(tick_labels=),
+# which replaced the deprecated `labels` keyword in that release.
 viz = [
-    "matplotlib>=3.8.0",
+    "matplotlib>=3.9.0",
 ]
 # The non-baseline forecasters. Both are heavyweight and platform-sensitive,
 # so they stay out of the core install; the models themselves import cleanly

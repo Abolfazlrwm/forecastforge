@@ -42,7 +42,7 @@ from forecastforge.config._optional import optional_import
 from forecastforge.core.errors import DataValidationError
 from forecastforge.models.base import Forecaster
 
-__all__ = ["LightGBMForecaster"]
+__all__ = ["LightGBMForecaster", "lightgbm_available"]
 
 _LIGHTGBM = optional_import("lightgbm")
 
@@ -50,6 +50,15 @@ _LIGHTGBM = optional_import("lightgbm")
 # (features_t, y_{t+h}) pairs for a split to mean anything.
 _MIN_TRAINING_PAIRS = 10
 _INSTALL_HINT = "Install it with: pip install -e '.[models]'"
+
+
+def lightgbm_available() -> bool:
+    """Return whether :class:`LightGBMForecaster` can be constructed.
+
+    Callers that build a list of candidate models use this to skip the ones
+    that would raise, instead of catching the construction error.
+    """
+    return _LIGHTGBM is not None
 
 
 def _require_lightgbm() -> Any:
