@@ -9,6 +9,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Implemented the forecasting interface under `src/forecastforge/models/`:
+  a `Forecaster` base class that fixes the horizon at construction, validates
+  the history, guards against predicting before fitting, and checks the output
+  length, so a concrete model implements only `_fit` and `_predict`.
+- Added four dependency-free baselines (`Naive`, `SeasonalNaive`,
+  `MovingAverage`, `Drift`) and three optional models behind the new
+  `[models]` extra: `ETSForecaster`, `ARIMAForecaster` (statsmodels), and
+  `LightGBMForecaster` (LightGBM). The optional models import cleanly without
+  their dependency and raise a message naming the extra when constructed.
+- Implemented `src/forecastforge/evaluation/`: MAE, RMSE, sMAPE, MASE,
+  directional accuracy, and interval coverage, each a pure function tested
+  against a hand-computed value; a `WalkForwardBacktester` with expanding and
+  rolling windows, step size, and a gap embargo returning a tidy frame; and a
+  reproducible benchmark.
+- Added leakage tests for the backtester itself — a structural audit, a
+  perturbation check, a truncation check, and two negative controls (a model
+  that reads one row past its history and a model holding the answer key) —
+  with the audit itself tested against an off-by-one boundary.
+- Added `python -m forecastforge.evaluation.benchmark` and `make benchmark`,
+  which run offline on five deterministic 2000-day synthetic paths and write
+  `docs/assets/benchmark_results.md` and `docs/assets/benchmark_mase.png`.
+- Added `tests/models/`, `tests/evaluation/`, and a CI job that installs the
+  `[models]` extra so the optional-model tests run instead of skipping.
+- Rewrote `docs/model-comparison.md` to document the implemented design, the
+  gap semantics, the leakage tests, and the measured benchmark result.
+
+### Added (feature engineering and configuration)
+
 - Implemented the feature engineering framework under
   `src/forecastforge/features/`: a `FeatureSet` container, a `Transform`
   base class with a checked output contract, seven causal transforms
@@ -41,6 +69,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- CI now runs the full gate on Python 3.12 and 3.13, matching the local
+  virtualenv instead of testing only the declared floor.
+- The `[viz]` extra floor moved to matplotlib 3.9 for
+  `Axes.boxplot(tick_labels=)`, which replaced the deprecated `labels`
+  keyword.
 - `Regime` now changes the process rather than the price level. It gains a
   `volatility_shift` field, and `level_shift` is off by default and opt-in.
   Previously `level_shift` injected an additive shock into a single log
