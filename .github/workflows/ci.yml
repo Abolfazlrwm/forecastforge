@@ -2,10 +2,11 @@ name: CI
 
 # Continuous integration for ForecastForge.
 #
-# One job, by design: the gates are cheap and sequential, so splitting them
-# across a matrix would add wall-clock time without adding signal. A second
-# job will be introduced only when a genuinely slow stage (Docker builds,
-# training runs) needs to be parallelised.
+# The quality job runs the same gates on every supported Python: 3.12 is the
+# floor declared in pyproject.toml, and 3.13 is what contributors run locally,
+# so a regression that only shows up on one of them must not slip through.
+# The wheel build/import check runs once (3.12) because the wheel layout does
+# not depend on the interpreter version; lint, types, and tests run on both.
 
 on:
   push:
@@ -26,18 +27,22 @@ env:
 
 jobs:
   quality:
-    name: Lint, type-check, test, and package
+    name: Lint, type-check, test, and package (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.13"]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python 3.12
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: ${{ matrix.python-version }}
           cache: "pip"
 
       - name: Install package with dev dependencies
@@ -61,7 +66,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-xml
+          name: coverage-xml-${{ matrix.python-version }}
           path: coverage.xml
           if-no-files-found: ignore
           retention-days: 7
@@ -69,10 +74,13 @@ jobs:
       # The gates above run against an editable install, which maps src/ onto
       # sys.path and therefore cannot detect a broken wheel layout. This step
       # builds the real distribution and imports it from a clean environment.
+      # It runs once, on 3.12: the wheel layout is interpreter-independent.
       - name: Build wheel
+        if: matrix.python-version == '3.12'
         run: python -m build --wheel --outdir dist
 
       - name: Install the wheel into a clean venv and import it
+        if: matrix.python-version == '3.12'
         run: |
           python -m venv /tmp/wheel-check
           /tmp/wheel-check/bin/python -m pip install --upgrade pip
@@ -94,3 +102,42 @@ jobs:
           }
           print(f"wheel import OK: {forecastforge.__file__}")
           PY
+
+  # The optional forecasters are behind the `models` extra, and their tests
+  # skip when the extra is absent — which is correct for a core install but
+  # would let a broken statsmodels or lightgbm integration stay green
+  # forever. This job installs the extra and runs those tests for real. The
+  # import check runs first so a failed install fails loudly instead of
+  # silently turning into a skip.
+  optional-models:
+    name: Optional models (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.13"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: Install package with dev and models extras
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev,models]"
+
+      - name: Verify the optional dependencies are importable
+        run: |
+          python -c "import statsmodels, lightgbm; print('statsmodels', statsmodels.__version__); print('lightgbm', lightgbm.__version__)"
+
+      - name: Test the optional models
+        # -rs lists the skip reasons, so a dependency that vanishes from the
+        # runner shows up in the log rather than passing quietly.
+        run: pytest tests/models -q --no-cov -rs
