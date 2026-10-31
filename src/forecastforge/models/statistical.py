@@ -24,7 +24,7 @@ from forecastforge.config._optional import optional_import
 from forecastforge.core.errors import DataValidationError
 from forecastforge.models.base import Forecaster
 
-__all__ = ["ARIMAForecaster", "ETSForecaster"]
+__all__ = ["ARIMAForecaster", "ETSForecaster", "statsmodels_available"]
 
 _HOLTWINTERS = optional_import("statsmodels.tsa.holtwinters")
 _ARIMA = optional_import("statsmodels.tsa.arima.model")
@@ -32,6 +32,15 @@ _ARIMA = optional_import("statsmodels.tsa.arima.model")
 _MIN_ORDER_TERMS = 3
 _SEASONAL_ORDER_TERMS = 4
 _INSTALL_HINT = "Install it with: pip install -e '.[models]'"
+
+
+def statsmodels_available() -> bool:
+    """Return whether the models in this module can be constructed.
+
+    Callers that build a list of candidate models use this to skip the ones
+    that would raise, instead of catching the construction error.
+    """
+    return _HOLTWINTERS is not None and _ARIMA is not None
 
 
 def _require(module: ModuleType | None, *, model: str, dependency: str) -> Any:
