@@ -8,8 +8,8 @@ model serving and monitoring.
 
 ## Current Status
 
-**Partially implemented.** The data and feature stages are built and tested;
-the modelling, tracking, serving, and monitoring stages are not.
+**Partially implemented.** The data, feature, model, and evaluation stages
+are built and tested; tracking, serving, monitoring, and orchestration are not.
 
 | Stage | Package | Status |
 |---|---|---|
@@ -18,8 +18,8 @@ the modelling, tracking, serving, and monitoring stages are not.
 | Data contracts | `schemas` | Implemented |
 | Ingestion | `data` | Implemented |
 | Feature engineering | `features` | Implemented |
-| Models | `models` | Placeholder |
-| Evaluation | `evaluation` | Placeholder |
+| Models | `models` | Implemented |
+| Evaluation | `evaluation` | Implemented |
 | Tracking | `tracking` | Placeholder |
 | Serving | `serving` | Placeholder |
 | Monitoring | `monitoring` | Placeholder |
@@ -44,6 +44,16 @@ remaining stage is designed.
   and target plus derived columns, which may contain NaN during warm-up.
   Transforms are causal and stateless; causality is verified by tests, not
   assumed.
+- **`models`** turns a history into `horizon` future values behind the
+  `Forecaster` interface. The base class owns validation, the
+  fitted-before-predict guard, and the output-length check; subclasses write
+  only `_fit` and `_predict`. Optional models resolve their dependency through
+  `config._optional` and never make it a hard requirement of the package.
+- **`evaluation`** owns the scoring boundary. It never sees more of the series
+  than a fold is allowed to see, and the same guarantee is asserted by tests
+  that perturb the future, truncate it, and hand the harness two deliberately
+  cheating models. Metrics are pure functions of arrays so any reported number
+  can be recomputed by hand.
 
 ## Planned Contents
 

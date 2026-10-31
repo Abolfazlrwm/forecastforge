@@ -5,8 +5,9 @@ document describes the conventions and workflow used to keep the
 project consistent and maintainable across many contributors.
 
 > **Note on current scope:** Phases 0 (repository foundation), 1 (data
-> layer, schemas, and validation), and 2 (feature engineering) are
-> completed and merged to `main`. Phase 3 (models and evaluation) is next.
+> layer, schemas, and validation), 2 (feature engineering), and 3 (models
+> and evaluation) are completed and merged to `main`. Phase 4 (CLI and
+> pipeline orchestration) is next.
 > See the [Roadmap Summary](README.md#roadmap-summary) in `README.md` for
 > the full plan.
 
