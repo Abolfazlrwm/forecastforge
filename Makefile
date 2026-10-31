@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help install lint format typecheck test clean run-precommit
+.PHONY: help install lint format typecheck test benchmark clean run-precommit
 
 PYTHON ?= python3.12
 PIP ?= $(PYTHON) -m pip
@@ -26,6 +26,9 @@ typecheck: ## Run MyPy static type checks in strict mode.
 
 test: ## Run the pytest suite with coverage.
 	pytest
+
+benchmark: ## Run the offline model benchmark and refresh docs/assets (needs .[models,viz]).
+	$(PYTHON) -m forecastforge.evaluation.benchmark
 
 clean: ## Remove caches, build artifacts, and coverage output.
 	rm -rf .pytest_cache .mypy_cache .ruff_cache .coverage coverage.xml htmlcov

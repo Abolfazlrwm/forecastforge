@@ -12,9 +12,9 @@ All documents in this directory are in **skeleton** status unless noted
 otherwise. "Skeleton" means: purpose and planned scope are defined, but
 implementation details, APIs, and diagrams describing built functionality
 do not yet exist because the functionality itself does not yet exist.
-`data-pipeline.md`, `feature-engineering.md`, and the configuration section
-of `development.md` document functionality that is implemented, tested, and
-runnable.
+`data-pipeline.md`, `feature-engineering.md`, `model-comparison.md`, and the
+configuration section of `development.md` document functionality that is
+implemented, tested, and runnable.
 
 ## Index
 
@@ -24,7 +24,7 @@ runnable.
 | [development.md](development.md) | Local development setup and workflow | Partially implemented |
 | [data-pipeline.md](data-pipeline.md) | Data ingestion and processing design | Implemented |
 | [feature-engineering.md](feature-engineering.md) | Feature engineering framework design | Implemented |
-| [model-comparison.md](model-comparison.md) | Model selection and comparison methodology | Skeleton |
+| [model-comparison.md](model-comparison.md) | Forecasters, metrics, backtesting, and the benchmark | Implemented |
 | [serving.md](serving.md) | Model serving and inference API design | Skeleton |
 | [monitoring.md](monitoring.md) | Observability and monitoring design | Skeleton |
 | [adr/](adr/) | Architectural Decision Records | Active |
