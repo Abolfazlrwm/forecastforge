@@ -8,13 +8,15 @@
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://www.conventionalcommits.org/en/v1.0.0/)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
 
-> **Status: Pre-Alpha — foundation, data layer, and feature engineering.**
-> **ForecastForge does not yet implement model training, evaluation,
-> serving, or monitoring.** What exists and is tested: the core exception
-> hierarchy, a validated ``TimeSeries`` container with structural
-> validation, a fully-offline data ingestion layer (synthetic source, file
-> loaders, and optional Yahoo Finance connector), and a leakage-safe
-> feature engineering framework.
+> **Status: Pre-Alpha — foundation, data layer, feature engineering, models,
+> and evaluation.**
+> **ForecastForge does not yet implement serving or monitoring.** What exists
+> and is tested: the core exception hierarchy, a validated ``TimeSeries``
+> container with structural validation, a fully-offline data ingestion layer
+> (synthetic source, file loaders, and optional Yahoo Finance connector), a
+> leakage-safe feature engineering framework, a forecaster interface with
+> four baselines and three optional models, and a walk-forward backtester with
+> a reproducible benchmark.
 
 ## Project Goals
 
@@ -59,8 +61,9 @@ scale. Concretely, the project is working toward:
 ## Architecture Overview
 
 The diagram below shows the **target architecture** and marks which stages
-exist today. Ingestion and feature engineering are implemented and tested;
-model training, tracking, serving, and monitoring are still planned.
+exist today. Ingestion, feature engineering, and model training/evaluation are
+implemented and tested; experiment tracking, serving, and monitoring are still
+planned.
 
 ```mermaid
 flowchart TD
@@ -87,8 +90,8 @@ flowchart TD
 
     classDef implemented fill:#e6f2e6,stroke:#2e7d32,stroke-width:2px,color:#1b5e20;
     classDef planned fill:#f5f5f5,stroke:#999,stroke-dasharray: 4 3,color:#555;
-    class B,C implemented;
-    class D,E,F,G planned;
+    class B,C,D implemented;
+    class E,F,G planned;
 ```
 
 Design principles guiding future implementation phases:
@@ -133,8 +136,8 @@ forecastforge/
 │       ├── utils/                # General-purpose utilities (placeholder)
 │       ├── data/                  # Data ingestion & access layer
 │       ├── features/               # Leakage-safe feature engineering
-│       ├── models/                  # Model definitions & training (planned)
-│       ├── evaluation/               # Model evaluation & metrics (planned)
+│       ├── models/                  # Forecaster interface, baselines, optional models
+│       ├── evaluation/               # Metrics, walk-forward backtester, benchmark
 │       ├── tracking/                  # Experiment tracking integration (planned)
 │       ├── serving/                    # Inference API layer (planned)
 │       ├── monitoring/                  # Runtime & model monitoring (planned)
@@ -186,14 +189,13 @@ forecastforge/
 
 ## Current Status
 
-This repository is in the **feature engineering phase**. What exists
+This repository is in the **model evaluation phase**. What exists
 today:
 
 - A `src`-layout Python package (`forecastforge`) with its full planned
-  subpackage structure. The `core`, `schemas`, `data`, and `features`
-  subpackages are implemented; the remaining subpackages (`models`,
-  `evaluation`, `serving`, `monitoring`, `tracking`) are stubbed and
-  await future phases.
+  subpackage structure. The `core`, `schemas`, `data`, `features`, `models`,
+  and `evaluation` subpackages are implemented; `serving`, `monitoring`, and
+  `tracking` are stubbed and await future phases.
 - **Core exception hierarchy** (`forecastforge.core.errors`) and a
   **validated ``TimeSeries`` container** (`forecastforge.schemas`) with
   strict structural validation (sorted ``DatetimeIndex``, numeric/finite
@@ -220,6 +222,27 @@ today:
   * A leakage test suite that truncates and perturbs the future for every
     transform, and is itself tested against three deliberately leaky
     implementations.
+- **Forecasting models** (`forecastforge.models`):
+  * ``Forecaster`` — a fit/predict interface with the horizon fixed at
+    construction, input validation and the fitted-before-predict guard
+    implemented once in the base class.
+  * Four dependency-free baselines — naive, seasonal naive, moving average,
+    and drift.
+  * Optional ``ETSForecaster``, ``ARIMAForecaster`` (statsmodels), and
+    ``LightGBMForecaster`` (LightGBM) behind the ``[models]`` extra. They
+    import cleanly without their dependency and raise a message naming the
+    extra when constructed.
+- **Evaluation** (`forecastforge.evaluation`):
+  * MAE, RMSE, sMAPE, MASE, directional accuracy, and interval coverage, each
+    a pure function tested against a hand-computed value.
+  * ``WalkForwardBacktester`` with expanding and rolling windows, step size,
+    and a gap embargo, returning a tidy frame of one row per
+    ``(fold, horizon, model)``.
+  * Leakage tests for the backtester itself: a structural audit, perturbation
+    and truncation checks, and two negative controls that would catch a
+    harness that could be fooled.
+  * A reproducible benchmark (``make benchmark``) over five 2000-day synthetic
+    paths that writes a markdown table and a figure to ``docs/assets/``.
 - A modern `pyproject.toml`-based build (Hatchling) targeting Python
   3.12+.
 - Linting and formatting via [Ruff](https://github.com/astral-sh/ruff);
@@ -228,8 +251,10 @@ today:
 - A test harness via [pytest](https://docs.pytest.org/) with coverage
   reporting configured and enforced at an 85% floor.
 - Continuous integration (`.github/workflows/ci.yml`) running Ruff,
-  MyPy, and pytest, then building the wheel and importing it in a clean
-  virtual environment, on every push and pull request.
+  MyPy, and pytest on Python 3.12 and 3.13, a second job that installs the
+  `[models]` extra so the optional-model tests really run, then building the
+  wheel and importing it in a clean virtual environment, on every push and
+  pull request.
 - Pre-commit hooks, Dependabot, YAML issue forms, a pull request
   template, and community health files (`CONTRIBUTING.md`,
   `CODE_OF_CONDUCT.md`, `SECURITY.md`, `CHANGELOG.md`).
@@ -241,18 +266,20 @@ today:
 
 What does **not** exist yet (by design):
 
-- Model training, evaluation, or inference code.
 - A serving/API layer.
 - Monitoring or alerting logic.
+- Experiment tracking and a model registry.
 - Built Docker images (Dockerfiles are placeholders only).
 
 ## What works today
 
-ForecastForge is not yet a forecasting engine, but the **data foundation is
-real, tested, and runnable**. The demo below uses the deterministic synthetic
-generator (`SyntheticSource`) to produce a ~2-year daily OHLCV series for a
-ticker, validates it through the `TimeSeries` container, and plots it with the
-optional `[viz]` extra.
+The pipeline runs end to end on offline data: generate a series, engineer
+features, fit a model, backtest it, and score it — all **real, tested, and
+runnable**. There is no serving layer or monitoring yet.
+
+The first demo uses the deterministic synthetic generator (`SyntheticSource`)
+to produce a ~2-year daily OHLCV series for a ticker, validates it through the
+`TimeSeries` container, and plots it with the optional `[viz]` extra.
 
 Run it yourself (after installing the optional visualization dependency):
 
@@ -306,8 +333,52 @@ What this demo demonstrates:
 - **Verified leakage safety** — a dedicated test suite truncates and perturbs
   the future for every transform and asserts the past never changes.
 
-Everything beyond feature engineering (models, evaluation, serving,
-monitoring — phases 3–9) is planned and not yet implemented.
+### Forecasting and backtesting
+
+Models implement one interface — fit on a history, predict the next `horizon`
+values — and the walk-forward backtester hands each fold only the rows at or
+before its cutoff:
+
+```python
+from forecastforge.data import SyntheticConfig, SyntheticSource
+from forecastforge.evaluation import BacktestConfig, WalkForwardBacktester
+from forecastforge.models import Drift, Naive
+
+series = SyntheticSource(config=SyntheticConfig(seed=3, length=600)).fetch(symbol="SPY")
+result = WalkForwardBacktester(BacktestConfig(initial_train=252, horizon=1)).run(
+    series.target_series, {"naive": Naive(), "drift": Drift(window=20)}
+)
+print(result.summary())
+```
+
+`make benchmark` compares every installed model over five deterministic
+2000-day paths and writes [`docs/assets/benchmark_results.md`](docs/assets/benchmark_results.md)
+and the figure below:
+
+![Mean and per-fold MASE for each model across five synthetic paths](docs/assets/benchmark_mase.png)
+
+**The measured result is that no model beats the naive forecast.** ARIMA scores
+a mean MASE of 1.087 against naive's 1.088 — a 0.001 difference on a 0.141
+seed-to-seed spread, which is a tie, not a win. ETS and drift land within
+noise, the moving average is three times worse, and LightGBM is worse still.
+On a near-random-walk price path there is no exploitable structure to find, and
+this repository says so rather than tuning until the table looks better. The
+full table and the rules behind it are in
+[docs/model-comparison.md](docs/model-comparison.md).
+
+What this demonstrates:
+
+- **A contract that cannot be quietly broken** — validation, the
+  fitted-before-predict guard, and the output-length check live in the base
+  class.
+- **Leakage tests for the harness, not just the models** — the backtester is
+  audited structurally, perturbed, truncated, and then tested against two
+  deliberately cheating models to prove the audit would catch them.
+- **Honest reporting** — the benchmark states its tolerance for calling
+  something a win, and reports a tie as a tie.
+
+Everything beyond model evaluation (CLI, tracking, serving, containers,
+monitoring — phases 4–9) is planned and not yet implemented.
 
 ## Development Workflow
 
@@ -338,6 +409,7 @@ Day-to-day commands, all defined in the [Makefile](Makefile):
 | `make format` | Auto-format code with Ruff |
 | `make typecheck` | Run MyPy in strict mode |
 | `make test` | Run the pytest suite with coverage |
+| `make benchmark` | Run the offline model benchmark and refresh `docs/assets/` (needs `[models,viz]`) |
 | `make run-precommit` | Run all pre-commit hooks against the whole repo |
 | `make clean` | Remove caches, build artifacts, and coverage output |
 
@@ -350,7 +422,7 @@ make lint typecheck test run-precommit
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the full contribution
 workflow, including branching strategy, commit conventions, and the
 pull request checklist, and [docs/development.md](docs/development.md)
-for the (currently skeletal) extended development guide.
+for the extended development guide.
 
 ## Roadmap Summary
 
@@ -359,7 +431,7 @@ for the (currently skeletal) extended development guide.
 | 0 | Repository health — tooling, CI, packaging, docs, OSS hygiene | ✅ Completed |
 | 1 | Data layer — schemas, validation, DataSource protocol, synthetic generator, file loaders, optional YFinance connector | ✅ Completed |
 | 2 | Feature engineering framework — `FeatureSet`, causal transforms, pipeline, leakage tests | ✅ Completed |
-| 3 | Models + evaluation framework | ⏳ Planned |
+| 3 | Models + evaluation framework — `Forecaster` interface, baselines, optional ETS/ARIMA/LightGBM, metrics, walk-forward backtester, benchmark | ✅ Completed |
 | 4 | CLI / pipeline orchestration | ⏳ Planned |
 | 5 | Experiment tracking & model registry integration | ⏳ Planned |
 | 6 | Serving layer / inference API | ⏳ Planned |
@@ -369,7 +441,7 @@ for the (currently skeletal) extended development guide.
 
 This roadmap will evolve; significant architectural choices will be
 captured as ADRs under [`docs/adr/`](docs/adr/) as they are made.
-**Phases 0–2 are completed. Phases 3–9 are planned.**
+**Phases 0–3 are completed. Phases 4–9 are planned.**
 
 ## Contributing
 

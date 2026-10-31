@@ -460,7 +460,9 @@ def save_report(
     """
     directory.mkdir(parents=True, exist_ok=True)
     table = directory / "benchmark_results.md"
-    table.write_text(render_markdown(result), encoding="utf-8")
+    # newline="\n" so a rerun on Windows produces the same bytes as one on
+    # Linux, otherwise the committed report shows a spurious diff every time.
+    table.write_text(render_markdown(result), encoding="utf-8", newline="\n")
     if not plot or _PYPLOT is None:
         return table, None
     return table, _plot(result, directory / "benchmark_mase.png")
