@@ -327,7 +327,7 @@ class CalendarFeatures(Transform):
         columns: dict[str, pd.Series] = {}
         for component in self.components:
             if component == "dayofweek":
-                columns["dt_dayofweek"] = pd.Series(index.dayofweek, index=index)
+                columns["dt_dayofweek"] = pd.Series(index.day_of_week, index=index)
             elif component == "dayofmonth":
                 columns["dt_dayofmonth"] = pd.Series(index.day, index=index)
             elif component == "month":
@@ -335,13 +335,13 @@ class CalendarFeatures(Transform):
             elif component == "quarter":
                 columns["dt_quarter"] = pd.Series(index.quarter, index=index)
             elif component == "dayofyear":
-                columns["dt_dayofyear"] = pd.Series(index.dayofyear, index=index)
+                columns["dt_dayofyear"] = pd.Series(index.day_of_year, index=index)
             elif component == "weekofyear":
                 columns["dt_weekofyear"] = pd.Series(
                     index.isocalendar().week.to_numpy(), index=index
                 )
             elif component == "dow_cyclic":
-                angle = 2.0 * np.pi * index.dayofweek.to_numpy() / 7.0
+                angle = 2.0 * np.pi * index.day_of_week.to_numpy() / 7.0
                 columns["dt_dow_sin"] = pd.Series(np.sin(angle), index=index)
                 columns["dt_dow_cos"] = pd.Series(np.cos(angle), index=index)
             else:  # month_cyclic
