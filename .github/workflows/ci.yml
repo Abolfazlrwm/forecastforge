@@ -141,3 +141,37 @@ jobs:
         # -rs lists the skip reasons, so a dependency that vanishes from the
         # runner shows up in the log rather than passing quietly.
         run: pytest tests/models -q --no-cov -rs
+
+  # The benchmark is a reporting target, not a test gate, so a broken import or
+  # a bad default would otherwise slip through until someone ran it by hand.
+  # This job runs it in fast mode (one seed, short series, no figure) on every
+  # push so a regression in `make benchmark` is caught in CI, not in a
+  # contributor's terminal. It installs the dev extra only: the baselines need
+  # no optional dependency, and --no-plot skips matplotlib. `make` auto-detects
+  # the interpreter, falling back to `python` here since there is no venv.
+  benchmark-smoke:
+    name: Benchmark smoke (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.13"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: Install package with dev dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Run the benchmark in fast mode
+        run: make benchmark-fast
