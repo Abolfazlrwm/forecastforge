@@ -1,7 +1,22 @@
 .DEFAULT_GOAL := help
-.PHONY: help install lint format typecheck test benchmark clean run-precommit
+.PHONY: help install lint format typecheck test benchmark benchmark-fast clean run-precommit
 
-PYTHON ?= python3.12
+# Pick the interpreter automatically, but honor an explicit override.
+# On Windows the virtualenv lives at .venv/Scripts/python.exe; on POSIX it is
+# .venv/bin/python. When neither exists (e.g. a system install) we fall back to
+# `python` so the targets still work. Hardcoding a version such as python3.12
+# broke `make` on machines where that exact interpreter is not on PATH.
+ifeq ($(OS),Windows_NT)
+    VENV_PYTHON := .venv/Scripts/python.exe
+else
+    VENV_PYTHON := .venv/bin/python
+endif
+
+ifneq (,$(wildcard $(VENV_PYTHON)))
+    PYTHON ?= $(VENV_PYTHON)
+else
+    PYTHON ?= python
+endif
 PIP ?= $(PYTHON) -m pip
 
 help: ## Show this help message.
@@ -15,20 +30,23 @@ install: ## Install the package with development dependencies (editable).
 	pre-commit install
 
 lint: ## Run Ruff lint checks (no changes applied).
-	ruff check .
+	$(PYTHON) -m ruff check .
 
 format: ## Auto-format code with Ruff (rewrites files).
-	ruff format .
-	ruff check . --fix
+	$(PYTHON) -m ruff format .
+	$(PYTHON) -m ruff check . --fix
 
 typecheck: ## Run MyPy static type checks in strict mode.
-	mypy src
+	$(PYTHON) -m mypy src
 
 test: ## Run the pytest suite with coverage.
-	pytest
+	$(PYTHON) -m pytest
 
 benchmark: ## Run the offline model benchmark and refresh docs/assets (needs .[models,viz]).
 	$(PYTHON) -m forecastforge.evaluation.benchmark
+
+benchmark-fast: ## Reduced benchmark for CI smoke checks (1 seed, short series, no plot).
+	$(PYTHON) -m forecastforge.evaluation.benchmark --fast --no-plot
 
 clean: ## Remove caches, build artifacts, and coverage output.
 	rm -rf .pytest_cache .mypy_cache .ruff_cache .coverage coverage.xml htmlcov
