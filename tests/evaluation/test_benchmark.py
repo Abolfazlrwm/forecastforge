@@ -230,6 +230,24 @@ def test_main_round_trips_its_arguments(tmp_path: Path) -> None:
     assert "seeds 1, 2" in text
 
 
+def test_main_fast_flag_uses_a_single_short_seed(tmp_path: Path) -> None:
+    # --fast must collapse to one seed and a short series and force no plot, so
+    # the CI smoke target exercises the benchmark without a heavy run.
+    exit_code = main(["--fast", "--output-dir", str(tmp_path)])
+    assert exit_code == 0
+    text = (tmp_path / "benchmark_results.md").read_text(encoding="utf-8")
+    assert "seeds 1" in text
+    assert not (tmp_path / "benchmark_mase.png").exists()
+
+
+def test_main_fast_env_var_reduces_the_run(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("BENCHMARK_FAST", "1")
+    exit_code = main(["--output-dir", str(tmp_path)])
+    assert exit_code == 0
+    text = (tmp_path / "benchmark_results.md").read_text(encoding="utf-8")
+    assert "seeds 1" in text
+
+
 def test_the_metrics_frame_is_typed_for_plotting(tiny_result: BenchmarkResult) -> None:
     # The plot reads these columns as floats; an object dtype would break it
     # only at render time, which is exactly when it is least convenient.
