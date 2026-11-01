@@ -2,9 +2,12 @@
 # Install locally with: pre-commit install
 # Run against all files with: pre-commit run --all-files
 # See https://pre-commit.com for full documentation.
-
-default_language_version:
-  python: python3.12
+#
+# There is deliberately no `default_language_version` here. Pinning it to a
+# version string such as `python3.12` makes every hook fail on a machine where
+# that exact interpreter is not on PATH — the same defect that broke the
+# Makefile on Windows. Hook environments inherit the interpreter running
+# pre-commit instead, which is the project virtualenv.
 
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
