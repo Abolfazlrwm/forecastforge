@@ -413,6 +413,11 @@ Day-to-day commands, all defined in the [Makefile](Makefile):
 | `make run-precommit` | Run all pre-commit hooks against the whole repo |
 | `make clean` | Remove caches, build artifacts, and coverage output |
 
+All `make` targets auto-detect the project virtualenv (`.venv/Scripts/python.exe`
+on Windows, `.venv/bin/python` elsewhere) and fall back to `python` otherwise;
+override the interpreter for every target with `PYTHON=...`. `make benchmark-fast`
+runs a reduced benchmark (one seed, short series, no figure) for CI smoke checks.
+
 Before opening a pull request, run:
 
 ```bash
