@@ -179,7 +179,7 @@ def test_log_return_column_name_differs_from_simple(counting_series: TimeSeries)
 def test_calendar_dayofweek_matches_the_index(counting_series: TimeSeries) -> None:
     # 2024-01-01 is a Monday, so the first row is day 0.
     values = _column(CalendarFeatures(["dayofweek"]), counting_series)
-    np.testing.assert_array_equal(values, counting_series.index.dayofweek.to_numpy())
+    np.testing.assert_array_equal(values, counting_series.index.day_of_week.to_numpy())
 
 
 def test_calendar_cyclic_encoding_is_bounded_and_wraps(counting_series: TimeSeries) -> None:
