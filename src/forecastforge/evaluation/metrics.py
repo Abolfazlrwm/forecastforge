@@ -233,7 +233,8 @@ def directional_accuracy(
         previous: The actual value immediately before each predicted point.
 
     Returns:
-        The percentage of correctly signed changes.
+        The percentage of correctly signed changes, or ``nan`` when every
+        actual change is zero (no direction existed to predict).
 
     Raises:
         DataValidationError: If the arrays differ in length.
@@ -247,6 +248,9 @@ def directional_accuracy(
         )
     actual_direction = np.sign(actual - reference)
     predicted_direction = np.sign(predicted - reference)
+    if np.count_nonzero(actual_direction) == 0:
+        # No actual change occurred, so there is no direction to predict.
+        return float("nan")
     return float(np.mean(actual_direction == predicted_direction) * 100.0)
 
 
