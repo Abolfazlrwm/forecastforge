@@ -16,6 +16,8 @@ Usage::
 
     python -m forecastforge.evaluation.benchmark
     python -m forecastforge.evaluation.benchmark --seeds 1 2 3 --length 1200
+    python -m forecastforge.evaluation.benchmark --fast        # 1 seed, short series
+    BENCHMARK_FAST=1 python -m forecastforge.evaluation.benchmark
 
 The optional forecasters are included only when their extra is installed; the
 report names the models it actually ran, so a core install produces a shorter
@@ -25,6 +27,7 @@ but still honest table.
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -503,19 +506,45 @@ def main(argv: Sequence[str] | None = None) -> int:
         action="store_true",
         help="skip the figure (useful on a machine without the viz extra)",
     )
+    parser.add_argument(
+        "--fast",
+        action="store_true",
+        help="reduced run for CI smoke checks: 1 seed, short series, no plot",
+    )
     arguments = parser.parse_args(argv)
 
+    # A reduced run for CI so `make benchmark` can never silently break: one
+    # seed, a short series, and no figure. The same effect can be forced
+    # without CLI access through the BENCHMARK_FAST environment variable.
+    fast = arguments.fast or os.environ.get("BENCHMARK_FAST", "").lower() in {
+        "1",
+        "true",
+        "yes",
+    }
+    if fast:
+        seeds: tuple[int, ...] = (1,)
+        length = 600
+        initial_train = 300
+        step = 100
+        plot = False
+    else:
+        seeds = tuple(arguments.seeds)
+        length = arguments.length
+        initial_train = arguments.initial_train
+        step = arguments.step
+        plot = not arguments.no_plot
+
     config = BenchmarkConfig(
-        seeds=tuple(arguments.seeds),
-        length=arguments.length,
+        seeds=seeds,
+        length=length,
         horizon=arguments.horizon,
-        initial_train=arguments.initial_train,
-        step=arguments.step,
+        initial_train=initial_train,
+        step=step,
         season=arguments.season,
     )
     result = run_benchmark(config)
     _emit(render_markdown(result))
-    table, figure = save_report(result, Path(arguments.output_dir), plot=not arguments.no_plot)
+    table, figure = save_report(result, Path(arguments.output_dir), plot=plot)
     _emit(f"wrote {table}")
     if figure is not None:
         _emit(f"wrote {figure}")
