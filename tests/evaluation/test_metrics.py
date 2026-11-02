@@ -7,6 +7,8 @@ as the implementation proves nothing, so the numbers below are literal.
 
 from __future__ import annotations
 
+import math
+
 import numpy as np
 import pytest
 
@@ -152,6 +154,12 @@ def test_directional_accuracy_is_one_hundred_for_a_perfect_forecast() -> None:
 def test_directional_accuracy_rejects_a_mismatched_reference() -> None:
     with pytest.raises(DataValidationError, match="previous must have the same length"):
         directional_accuracy([1.0, 2.0], [1.0, 2.0], [1.0])
+
+
+def test_directional_accuracy_is_nan_when_no_actual_change_occurs() -> None:
+    # Every outcome is flat: there is no direction to predict.
+    value = directional_accuracy([5.0, 5.0, 5.0], [6.0, 4.0, 5.0], [5.0, 5.0, 5.0])
+    assert math.isnan(value)
 
 
 # -- interval coverage -----------------------------------------------------
