@@ -9,6 +9,7 @@ win — rather than checking any particular accuracy number.
 from __future__ import annotations
 
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 import pandas as pd
 import pytest
@@ -254,3 +255,43 @@ def test_the_metrics_frame_is_typed_for_plotting(tiny_result: BenchmarkResult) -
     metrics = tiny_result.metrics
     assert isinstance(metrics, pd.DataFrame)
     assert metrics["mase"].dtype == "float64"
+
+
+def test_benchmark_sanity() -> None:
+    """End-to-end sanity check: the benchmark produces a coherent result."""
+    config = _tiny()
+    result = run_benchmark(config)
+
+    # All expected baselines are present.
+    assert {"naive", "seasonal_naive", "moving_average", "drift"} <= set(result.models)
+
+    # Every (seed, model) pair contributed exactly one row.
+    assert len(result.metrics) == len(config.seeds) * len(result.models)
+
+    # The naive model's MASE must be close to 1.0 (it is the scale).
+    summary = result.summary()
+    naive_mase = summary.loc["naive", "mase_mean"]
+    assert 0.5 < naive_mase < 2.0
+
+    # Summary has mean and std for every reported metric.
+    for metric in ("mase", "mae", "rmse", "smape", "directional_accuracy"):
+        assert f"{metric}_mean" in summary.columns
+        assert f"{metric}_std" in summary.columns
+
+    # Per-fold MASE covers every fold that existed.
+    folds = result.n_folds()
+    assert folds > 0
+    per_model = result.fold_mase.groupby("model")["fold"].nunique()
+    assert (per_model == folds).all()
+
+    # Markdown renders without error and contains the honesty rule.
+    text = render_markdown(result)  # type: ignore[arg-type]
+    assert "# ForecastForge benchmark" in text
+    assert "standard deviation below the naive mean" in text
+
+    # Save round-trips.
+    with TemporaryDirectory() as td:
+        path = Path(td)
+        table, _figure = save_report(result, path, plot=False)
+        assert table.exists()
+        assert table.read_text(encoding="utf-8").startswith("# ForecastForge benchmark")
