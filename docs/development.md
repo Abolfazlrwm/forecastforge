@@ -149,6 +149,17 @@ The `config` package also provides several utilities that sit alongside
   generators. NumPy is a core dependency; PyTorch is optional and is
   skipped when absent.
 
+## Running the developer commands
+
+The root `Makefile` exposes `install`, `lint`, `format`, `typecheck`, `test`,
+`benchmark`, `benchmark-fast`, `run-precommit`, and `clean`. Each target
+resolves its Python interpreter automatically: it uses the project virtualenv
+(`.venv/Scripts/python.exe` on Windows, `.venv/bin/python` elsewhere) when
+present, and falls back to `python` otherwise. Set `PYTHON=...` to override
+the interpreter for every target. `make benchmark-fast` runs the benchmark in
+reduced mode (one seed, short series, no figure); CI uses it as a smoke test so
+the target cannot silently break.
+
 ## Planned Contents
 
 The following sections of this guide remain unwritten until the
