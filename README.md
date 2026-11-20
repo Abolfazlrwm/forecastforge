@@ -8,15 +8,14 @@
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://www.conventionalcommits.org/en/v1.0.0/)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
 
-> **Status: Pre-Alpha — foundation, data layer, feature engineering, models,
-> and evaluation.**
-> **ForecastForge does not yet implement serving or monitoring.** What exists
-> and is tested: the core exception hierarchy, a validated ``TimeSeries``
-> container with structural validation, a fully-offline data ingestion layer
-> (synthetic source, file loaders, and optional Yahoo Finance connector), a
-> leakage-safe feature engineering framework, a forecaster interface with
-> four baselines and three optional models, and a walk-forward backtester with
-> a reproducible benchmark.
+> [!WARNING]
+> **Status: PRE-ALPHA — not production-ready. Experiment tracking, serving and
+> monitoring are not implemented.** What exists and is tested: the core exception
+> hierarchy, a validated `TimeSeries` container with structural validation, a
+> fully-offline data ingestion layer (synthetic source, file loaders, and optional
+> Yahoo Finance connector), a leakage-safe feature engineering framework, a
+> forecaster interface with four baselines and three optional models, and a
+> walk-forward backtester with a reproducible benchmark.
 
 ## Project Goals
 
