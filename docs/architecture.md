@@ -3,7 +3,7 @@
 ## Purpose
 
 ForecastForge's system architecture: the major components, their
-responsibilities, and how they interact — from data ingestion through to
+responsibilities, and how they interact, from data ingestion through to
 model serving and monitoring.
 
 ## Current Status
@@ -40,7 +40,7 @@ remaining stage is designed.
   boundary, and is never re-derived downstream.
 - **`data`** turns a symbol and a window into a validated `TimeSeries`.
   Sources are interchangeable behind the `DataSource` protocol.
-- **`features`** turns a `TimeSeries` into a `FeatureSet` — the same timeline
+- **`features`** turns a `TimeSeries` into a `FeatureSet`: the same timeline
   and target plus derived columns, which may contain NaN during warm-up.
   Transforms are causal and stateless; causality is verified by tests, not
   assumed.
@@ -57,17 +57,17 @@ remaining stage is designed.
 
 ## Planned Contents
 
-- **System context diagram** — ForecastForge's boundaries and its external
+- **System context diagram**: ForecastForge's boundaries and its external
   dependencies (data sources, tracking backends, consumers of forecasts).
-- **Data flow** — how data moves from raw sources through interim and
+- **Data flow**: how data moves from raw sources through interim and
   processed stages into features, and from trained models into served
   predictions.
-- **Pipeline orchestration model** — how pipeline stages are composed,
+- **Pipeline orchestration model**: how pipeline stages are composed,
   scheduled, and retried, and what orchestration tooling (if any) is
   adopted, with the decision recorded as an ADR.
-- **Deployment topology** — how components map onto the containers defined
+- **Deployment topology**: how components map onto the containers defined
   under `docker/` once those are implemented.
-- **Cross-cutting concerns** — logging, error handling, and versioning
+- **Cross-cutting concerns**: logging, error handling, and versioning
   conventions used across components.
 
 See [docs/adr/](adr/) for the architectural decisions already made.

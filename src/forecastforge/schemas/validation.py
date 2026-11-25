@@ -62,7 +62,7 @@ def validate_frame(
         target: Name of the numeric column holding the value to forecast.
         covariates: Names of additional numeric columns that will be used as
             exogenous inputs.
-        frequency: pandas offset alias (``"B"``, ``"D"``, …) used only to
+        frequency: pandas offset alias (``"B"``, ``"D"``, ...) used only to
             detect gaps. Required when ``require_complete`` is true.
         require_complete: When true, a series with missing periods is
             rejected. Off by default because real market data legitimately

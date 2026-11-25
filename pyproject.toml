@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "forecastforge"
-version = "0.1.0"
-description = "ForecastForge: a production-grade, open-source forecasting platform."
+version = "0.1.1"
+description = "ForecastForge: an open-source time-series forecasting library with leakage-safe features, walk-forward evaluation, and a reproducible benchmark."
 readme = "README.md"
 requires-python = ">=3.12"
 license = { text = "MIT" }

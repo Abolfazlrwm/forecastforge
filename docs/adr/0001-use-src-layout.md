@@ -13,9 +13,9 @@ engineering, training, serving, monitoring).
 
 Two common layouts were considered:
 
-1. **Flat layout** — the package lives directly at the repository root
+1. **Flat layout**: the package lives directly at the repository root
    (e.g. `forecastforge/__init__.py` next to `pyproject.toml`).
-2. **src-layout** — the package lives under a `src/` directory (e.g.
+2. **src-layout**: the package lives under a `src/` directory (e.g.
    `src/forecastforge/__init__.py`), separate from repository-root files
    such as configuration, documentation, and tooling.
 
@@ -24,17 +24,17 @@ well-documented failure mode: because the repository root is often on
 `sys.path` (e.g. when running `pytest` or a script from the repo root),
 it is possible to accidentally import the package from the source tree
 even when it has not been installed, or to import a stale version
-instead of the installed one. This masks packaging errors — a
+instead of the installed one. This masks packaging errors: a
 package that "works" only because of the current working directory,
 and silently breaks once installed elsewhere (e.g. in a Docker image,
-a CI runner, or another contributor's machine) — which is the opposite
+a CI runner, or another contributor's machine), which is the opposite
 of what a project intending to be maintained by multiple contributors
 needs.
 
-ForecastForge is explicitly intended to be a production-grade,
-multi-contributor open-source project with an eventual multi-component
-architecture (ingestion, feature engineering, modeling, serving,
-monitoring — see `docs/architecture.md`). It will be installed via
+ForecastForge is explicitly intended to be a multi-contributor
+open-source project with an eventual multi-component architecture
+(ingestion, feature engineering, modeling, serving, monitoring; see
+`docs/architecture.md`). It will be installed via
 `pip install -e .` in local development, installed non-editable in CI
 and containers, and potentially packaged for distribution.
 
@@ -46,8 +46,11 @@ directly importable as part of the package.
 
 This is reflected in:
 
-- `pyproject.toml`: `[tool.hatch.build.targets.wheel] packages = ["src"]`
-  and `[tool.pytest.ini_options] pythonpath = ["src"]`.
+- `pyproject.toml`: `[tool.hatch.build.targets.wheel] packages = ["src/forecastforge"]`
+  and `[tool.pytest.ini_options] pythonpath = ["src"]`. The wheel target
+  originally shipped the whole `src` directory, which archived every module
+  under a `src/` prefix inside site-packages and broke non-editable installs;
+  it now names the package directory itself.
 - The package only being importable after installation (editable or
   otherwise), never by accident via the current working directory.
 - `src/forecastforge/py.typed` marking the installed package as typed,

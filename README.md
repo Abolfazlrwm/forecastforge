@@ -9,7 +9,7 @@
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
 
 > [!WARNING]
-> **Status: PRE-ALPHA — not production-ready. Experiment tracking, serving and
+> **Status: PRE-ALPHA, not production-ready. Experiment tracking, serving and
 > monitoring are not implemented.** What exists and is tested: the core exception
 > hierarchy, a validated `TimeSeries` container with structural validation, a
 > fully-offline data ingestion layer (synthetic source, file loaders, and optional
@@ -29,7 +29,7 @@ scale. Concretely, the project is working toward:
 - A **reproducible experimentation workflow**, where every training run
   is tracked, versioned, and comparable against prior runs.
 - A **maintainable codebase** that a distributed group of open-source
-  contributors — not just its original authors — can safely extend.
+  contributors, not just its original authors, can safely extend.
 - A **deployable serving layer** that exposes trained models through a
   documented, versioned API.
 - **Built-in observability**, so that data drift and model degradation
@@ -37,22 +37,22 @@ scale. Concretely, the project is working toward:
 
 ## Guiding Principles
 
-- **Reproducibility** — deterministic environments, pinned tooling, and
+- **Reproducibility**: deterministic environments, pinned tooling, and
   versioned experiment artifacts.
-- **Observability** — structured logging and experiment tracking as
+- **Observability**: structured logging and experiment tracking as
   first-class citizens, not afterthoughts.
-- **Maintainability** — strict linting, static typing, automated
+- **Maintainability**: strict linting, static typing, automated
   testing, and a documented architectural decision record (ADR) trail
   so the project remains legible as it grows and as contributors
   change.
-- **Composability** — a pipeline-oriented architecture where ingestion,
+- **Composability**: a pipeline-oriented architecture where ingestion,
   feature engineering, modeling, and serving are independently testable
   and independently deployable stages.
-- **Openness** — a governance and contribution model (see
+- **Openness**: a governance and contribution model (see
   [CONTRIBUTING.md](CONTRIBUTING.md) and
   [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)) that welcomes external
   maintainers, not just a single team.
-- **Incrementalism** — each phase of the project is scoped narrowly so
+- **Incrementalism**: each phase of the project is scoped narrowly so
   the engineering foundation is solid before higher-risk,
   higher-complexity work (data ingestion, feature engineering, and
   modeling) begins.
@@ -110,7 +110,7 @@ Design principles guiding future implementation phases:
 - Containerization (`docker/`, `docker-compose.yml`) will formalize the
   runtime environment once services exist to containerize.
 - Significant, hard-to-reverse architectural choices are recorded as
-  ADRs under [`docs/adr/`](docs/adr/) — see
+  ADRs under [`docs/adr/`](docs/adr/); see
   [0001-use-src-layout.md](docs/adr/0001-use-src-layout.md) for the
   first example.
 
@@ -123,25 +123,25 @@ lives in [docs/architecture.md](docs/architecture.md).
 forecastforge/
 ├── .github/
 │   ├── workflows/
-│   │   └── ci.yml            # Lint, type-check, test, wheel smoke test
+│   │   └── ci.yml             # Lint, type-check, test, wheel smoke test
 │   ├── ISSUE_TEMPLATE/        # Bug report and feature request forms
 │   ├── dependabot.yml         # Automated dependency updates
 │   └── pull_request_template.md
 ├── src/
 │   └── forecastforge/         # Installable Python package (src-layout)
-│       ├── config/             # Settings loading & validation
-│       ├── core/                # Shared domain types & interfaces
-│       ├── common/              # Cross-cutting helpers (placeholder)
-│       ├── utils/                # General-purpose utilities (placeholder)
-│       ├── data/                  # Data ingestion & access layer
-│       ├── features/               # Leakage-safe feature engineering
-│       ├── models/                  # Forecaster interface, baselines, optional models
-│       ├── evaluation/               # Metrics, walk-forward backtester, benchmark
-│       ├── tracking/                  # Experiment tracking integration (planned)
-│       ├── serving/                    # Inference API layer (planned)
-│       ├── monitoring/                  # Runtime & model monitoring (planned)
-│       ├── pipelines/                    # Pipeline orchestration (planned)
-│       └── schemas/                       # Shared data/config schemas
+│       ├── config/            # Settings loading & validation
+│       ├── core/              # Shared domain types & interfaces
+│       ├── common/            # Cross-cutting helpers (placeholder)
+│       ├── utils/             # General-purpose utilities (placeholder)
+│       ├── data/              # Data ingestion & access layer
+│       ├── features/          # Leakage-safe feature engineering
+│       ├── models/            # Forecaster interface, baselines, optional models
+│       ├── evaluation/        # Metrics, walk-forward backtester, benchmark
+│       ├── tracking/          # Experiment tracking integration (planned)
+│       ├── serving/           # Inference API layer (planned)
+│       ├── monitoring/        # Runtime & model monitoring (planned)
+│       ├── pipelines/         # Pipeline orchestration (planned)
+│       └── schemas/           # Shared data/config schemas
 ├── tests/                     # Automated test suite (pytest)
 ├── docs/                      # Project documentation
 │   ├── architecture.md
@@ -151,7 +151,7 @@ forecastforge/
 │   ├── model-comparison.md
 │   ├── serving.md
 │   ├── monitoring.md
-│   └── adr/                    # Architectural Decision Records
+│   └── adr/                   # Architectural Decision Records
 ├── pipelines/                 # Pipeline/orchestration definitions (future)
 ├── notebooks/                 # Exploratory notebooks (not for production code)
 ├── docker/                    # Container build contexts (placeholders)
@@ -159,19 +159,19 @@ forecastforge/
 │   ├── mlflow/Dockerfile
 │   └── monitor/Dockerfile
 ├── scripts/                   # Developer & operational scripts
-│   ├── bootstrap.sh             # Local setup (POSIX)
-│   └── bootstrap.ps1            # Local setup (Windows/PowerShell)
+│   ├── bootstrap.sh           # Local setup (POSIX)
+│   └── bootstrap.ps1          # Local setup (Windows/PowerShell)
 ├── configs/                   # Application & logging configuration
-│   ├── settings.toml            # Base settings
-│   ├── development.toml         # Development overrides
-│   ├── testing.toml             # Testing overrides
-│   ├── production.toml          # Production overrides
-│   └── logging.yaml             # Logging configuration
+│   ├── settings.toml          # Base settings
+│   ├── development.toml       # Development overrides
+│   ├── testing.toml           # Testing overrides
+│   ├── production.toml        # Production overrides
+│   └── logging.yaml           # Logging configuration
 ├── data/                      # Local data workspace (git-ignored contents)
-│   ├── raw/                     # Immutable, original data
-│   ├── interim/                  # Intermediate, partially processed data
-│   ├── processed/                 # Final, model-ready datasets
-│   └── external/                   # Data sourced from third parties
+│   ├── raw/                   # Immutable, original data
+│   ├── interim/               # Intermediate, partially processed data
+│   ├── processed/             # Final, model-ready datasets
+│   └── external/              # Data sourced from third parties
 ├── models/                    # Serialized model artifacts (git-ignored)
 ├── mlruns/                    # Experiment tracking store (git-ignored)
 ├── pyproject.toml             # Packaging, dependency, and tool configuration
@@ -208,12 +208,12 @@ today:
     via the ``[data]`` extra, lazily imported and cached to Parquet.
   * CSV and Parquet **file loaders** that preserve a ``DatetimeIndex``.
 - **Feature engineering framework** (`forecastforge.features`):
-  * ``FeatureSet`` — a container that keeps the strict index and target
+  * ``FeatureSet``, a container that keeps the strict index and target
     guarantees of ``TimeSeries`` while allowing NaN in generated columns,
     and reports the warm-up period as an explicit row count.
   * ``Transform`` base class with a checked contract: a transform declares
     the columns it produces and ``apply`` verifies them on every call.
-  * Seven causal transforms — lags, rolling statistics, simple and log
+  * Seven causal transforms: lags, rolling statistics, simple and log
     returns, annualised volatility, RSI, MACD, and calendar features with
     cyclic sine/cosine encodings.
   * ``FeaturePipeline`` for ordered composition, where later steps consume
@@ -222,10 +222,10 @@ today:
     transform, and is itself tested against three deliberately leaky
     implementations.
 - **Forecasting models** (`forecastforge.models`):
-  * ``Forecaster`` — a fit/predict interface with the horizon fixed at
+  * ``Forecaster``, a fit/predict interface with the horizon fixed at
     construction, input validation and the fitted-before-predict guard
     implemented once in the base class.
-  * Four dependency-free baselines — naive, seasonal naive, moving average,
+  * Four dependency-free baselines: naive, seasonal naive, moving average,
     and drift.
   * Optional ``ETSForecaster``, ``ARIMAForecaster`` (statsmodels), and
     ``LightGBMForecaster`` (LightGBM) behind the ``[models]`` extra. They
@@ -273,8 +273,8 @@ What does **not** exist yet (by design):
 ## What works today
 
 The pipeline runs end to end on offline data: generate a series, engineer
-features, fit a model, backtest it, and score it — all **real, tested, and
-runnable**. There is no serving layer or monitoring yet.
+features, fit a model, backtest it, and score it. All of it is **real, tested,
+and runnable**. There is no serving layer or monitoring yet.
 
 The first demo uses the deterministic synthetic generator (`SyntheticSource`)
 to produce a ~2-year daily OHLCV series for a ticker, validates it through the
@@ -294,16 +294,16 @@ plot to `docs/assets/synthetic_spy_demo.png`:
 
 This demo exercises **only** the capabilities implemented so far:
 
-- **Data generation** — a fully-seeded, reproducible synthetic OHLCV source.
-- **Validation** — every generated frame is parsed into a validated `TimeSeries`
+- **Data generation**: a fully-seeded, reproducible synthetic OHLCV source.
+- **Validation**: every generated frame is parsed into a validated `TimeSeries`
   (sorted `DatetimeIndex`, finite numeric columns).
-- **Loading** — the same `TimeSeries` round-trips through the CSV and Parquet
+- **Loading**: the same `TimeSeries` round-trips through the CSV and Parquet
   file loaders without loss of structure.
 
 ### Feature engineering
 
 The second demo runs a `FeaturePipeline` over that same series. Each transform
-is causal — the value at any row is computed only from rows at or before it —
+is causal (the value at any row is computed only from rows at or before it),
 and the pipeline reports how many leading rows are still warming up:
 
 ```bash
@@ -326,17 +326,17 @@ enough history, so no model may use them.
 What this demo demonstrates:
 
 - **Lags, rolling statistics, returns, volatility, RSI, MACD, and calendar
-  features** — thirteen columns, all causal.
-- **Explicit warm-up** — `FeatureSet.warmup` counts the unusable prefix
+  features**: thirteen columns, all causal.
+- **Explicit warm-up**: `FeatureSet.warmup` counts the unusable prefix
   instead of hiding it behind a fill or a silent row drop.
-- **Verified leakage safety** — a dedicated test suite truncates and perturbs
+- **Verified leakage safety**: a dedicated test suite truncates and perturbs
   the future for every transform and asserts the past never changes.
 
 ### Forecasting and backtesting
 
-Models implement one interface — fit on a history, predict the next `horizon`
-values — and the walk-forward backtester hands each fold only the rows at or
-before its cutoff:
+Models implement one interface, fit on a history and predict the next
+`horizon` values, and the walk-forward backtester hands each fold only the
+rows at or before its cutoff:
 
 ```python
 from forecastforge.data import SyntheticConfig, SyntheticSource
@@ -357,7 +357,7 @@ and the figure below:
 ![Mean and per-fold MASE for each model across five synthetic paths](docs/assets/benchmark_mase.png)
 
 **The measured result is that no model beats the naive forecast.** ARIMA scores
-a mean MASE of 1.087 against naive's 1.088 — a 0.001 difference on a 0.141
+a mean MASE of 1.087 against naive's 1.088, a 0.001 difference on a 0.141
 seed-to-seed spread, which is a tie, not a win. ETS and drift land within
 noise, the moving average is three times worse, and LightGBM is worse still.
 On a near-random-walk price path there is no exploitable structure to find, and
@@ -367,17 +367,17 @@ full table and the rules behind it are in
 
 What this demonstrates:
 
-- **A contract that cannot be quietly broken** — validation, the
+- **A contract that cannot be quietly broken**: validation, the
   fitted-before-predict guard, and the output-length check live in the base
   class.
-- **Leakage tests for the harness, not just the models** — the backtester is
+- **Leakage tests for the harness, not just the models**: the backtester is
   audited structurally, perturbed, truncated, and then tested against two
   deliberately cheating models to prove the audit would catch them.
-- **Honest reporting** — the benchmark states its tolerance for calling
+- **Honest reporting**: the benchmark states its tolerance for calling
   something a win, and reports a tie as a tie.
 
 Everything beyond model evaluation (CLI, tracking, serving, containers,
-monitoring — phases 4–9) is planned and not yet implemented.
+monitoring: phases 4–9) is planned and not yet implemented.
 
 ## Development Workflow
 
@@ -432,10 +432,10 @@ for the extended development guide.
 
 | Phase | Scope | Status |
 |-------|-------|--------|
-| 0 | Repository health — tooling, CI, packaging, docs, OSS hygiene | ✅ Completed |
-| 1 | Data layer — schemas, validation, DataSource protocol, synthetic generator, file loaders, optional YFinance connector | ✅ Completed |
-| 2 | Feature engineering framework — `FeatureSet`, causal transforms, pipeline, leakage tests | ✅ Completed |
-| 3 | Models + evaluation framework — `Forecaster` interface, baselines, optional ETS/ARIMA/LightGBM, metrics, walk-forward backtester, benchmark | ✅ Completed |
+| 0 | Repository health: tooling, CI, packaging, docs, OSS hygiene | ✅ Completed |
+| 1 | Data layer: schemas, validation, DataSource protocol, synthetic generator, file loaders, optional YFinance connector | ✅ Completed |
+| 2 | Feature engineering framework: `FeatureSet`, causal transforms, pipeline, leakage tests | ✅ Completed |
+| 3 | Models + evaluation framework: `Forecaster` interface, baselines, optional ETS/ARIMA/LightGBM, metrics, walk-forward backtester, benchmark | ✅ Completed |
 | 4 | CLI / pipeline orchestration | ⏳ Planned |
 | 5 | Experiment tracking & model registry integration | ⏳ Planned |
 | 6 | Serving layer / inference API | ⏳ Planned |

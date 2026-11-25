@@ -17,7 +17,18 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
 VENV_DIR=".venv"
-PYTHON_BIN="${PYTHON_BIN:-python3.12}"
+
+# Same rationale as the Makefile: hardcoding python3.12 breaks the script on
+# machines where that exact interpreter is not on PATH. Honor an explicit
+# override first, then fall back from python3.12 to whatever python3 exists.
+PYTHON_BIN="${PYTHON_BIN:-}"
+if [ -z "${PYTHON_BIN}" ]; then
+  if command -v python3.12 >/dev/null 2>&1; then
+    PYTHON_BIN="python3.12"
+  else
+    PYTHON_BIN="python3"
+  fi
+fi
 
 echo "==> Using Python interpreter: ${PYTHON_BIN}"
 

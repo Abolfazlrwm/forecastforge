@@ -122,8 +122,8 @@ Before opening a pull request, please confirm:
 Every `make` target resolves its Python interpreter automatically: when a
 project virtualenv exists it uses `.venv/Scripts/python.exe` on Windows or
 `.venv/bin/python` on POSIX, and otherwise falls back to `python` on PATH.
-This is what lets the same `Makefile` work unchanged across operating systems
-— it never hardcodes a version string such as `python3.12`. Set `PYTHON=...`
+This is what lets the same `Makefile` work unchanged across operating systems;
+it never hardcodes a version string such as `python3.12`. Set `PYTHON=...`
 to override the interpreter for **all** targets. The `benchmark-fast` target
 runs the benchmark in reduced mode (one seed, short series, no figure) for CI
 smoke checks.
@@ -162,5 +162,5 @@ smoke checks.
 
 ## Getting Help
 
-If anything in this guide is unclear, please open an issue — improving
+If anything in this guide is unclear, please open an issue; improving
 this document is itself a welcome contribution.

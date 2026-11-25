@@ -1,4 +1,4 @@
-"""ForecastForge: a production-grade, open-source forecasting platform.
+"""ForecastForge: an open-source time-series forecasting library.
 
 Implemented:
   * Core exception hierarchy and validated ``TimeSeries`` container.
@@ -10,10 +10,16 @@ Implemented:
   * Feature engineering: ``FeatureSet`` container, causal transforms (lags,
     rolling statistics, returns, volatility, RSI, MACD, calendar features),
     and an ordered ``FeaturePipeline`` with a leakage test suite.
+  * Forecasting models: a ``Forecaster`` base class with the shared
+    fit/predict contract, four dependency-free baselines, and optional
+    ETS, ARIMA, and LightGBM forecasters behind the ``[models]`` extra.
+  * Evaluation: MAE, RMSE, sMAPE, MASE, directional accuracy, interval
+    coverage, a leakage-safe walk-forward backtester, and a reproducible
+    benchmark.
 
 Still planned:
-  * Model training, evaluation, and serving layers.
-  * Experiment tracking, monitoring, and containerised deployment.
+  * CLI and pipeline orchestration.
+  * Experiment tracking, serving, monitoring, and containerised deployment.
 
 This module exposes package metadata so that the package is importable and
 its version can be introspected by tooling (pip, build backends, CI, docs).
