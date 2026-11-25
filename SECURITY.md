@@ -2,15 +2,17 @@
 
 ## Supported Versions
 
-ForecastForge is currently in a **pre-alpha, repository foundation**
-phase (see `README.md`). There are no tagged releases yet, and no
-version is currently designated as "supported" in a formal sense. Once
-the project reaches a first tagged release, this table will be updated
-to reflect which versions receive security fixes.
+ForecastForge is currently in a **pre-alpha** phase (see the status
+warning in `README.md`). Fixes, including security fixes, land on
+`main`, and the latest tagged release is the best-effort supported
+version. Because the project has not reached 1.0 yet, no release is
+promised long-term support; older tags will generally not receive
+backports.
 
 | Version | Supported |
 | ------- | --------- |
-| `0.1.x` (pre-release, `main`) | :white_check_mark: (best effort) |
+| latest tagged release (`0.1.x`) | :white_check_mark: (best effort) |
+| older releases | :x: (upgrade to the latest tag) |
 
 ## Reporting a Vulnerability
 
@@ -51,12 +53,14 @@ Please include, where applicable:
 
 ### Scope
 
-Because ForecastForge does not yet implement data ingestion, model
-training, or a serving API, the current attack surface is limited
+Because ForecastForge does not yet implement a serving API or any
+network service of its own, the current attack surface is limited
 primarily to the repository's tooling and CI configuration (e.g.
-supply-chain concerns in dependencies or GitHub Actions workflows).
-Reports concerning dependencies, build configuration, or CI/CD security
-are welcome and in scope. This section will be expanded as
-functionality (data handling, model serving, etc.) is implemented.
+supply-chain concerns in dependencies or GitHub Actions workflows),
+plus the optional Yahoo Finance connector for anyone using the `[data]`
+extra against live market data. Reports concerning dependencies, build
+configuration, or CI/CD security are welcome and in scope. This section
+will be expanded as functionality (model serving, experiment tracking,
+etc.) is implemented.
 
 Thank you for helping keep ForecastForge and its users safe.
