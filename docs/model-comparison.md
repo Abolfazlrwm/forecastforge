@@ -38,8 +38,8 @@ Three details are deliberate:
   multi-horizon model fits one estimator per step and needs to know `h` while
   fitting. Passing it at prediction time would force those models to refit or
   to fake it.
-- **The base class owns the invariants** — history validation, the
-  fitted-before-predict guard, and the output-length check — so a subclass
+- **The base class owns the invariants**: history validation, the
+  fitted-before-predict guard, and the output-length check, so a subclass
   writes only `_fit` and `_predict`. This mirrors
   [`Transform`](feature-engineering.md): the shared contract lives in one
   place, so no model can quietly break it.
@@ -97,7 +97,7 @@ Two conventions matter enough to state explicitly, because the literature does
 not agree on them:
 
 - **sMAPE** uses the `2|e| / (|y| + |ŷ|)` form. Its ceiling is 200%, not 100%.
-  A zero denominator is defined as 0 — the forecast was exactly right.
+  A zero denominator is defined as 0: the forecast was exactly right.
 - **MASE** is scaled by the naive error of *the fold's training window*, never
   by anything from the test region. `m = 1` makes 1.0 mean "exactly the naive
   forecast". A larger `m` scales by the seasonal naive error, and on a random
@@ -160,13 +160,13 @@ rather than left implicit in the slicing:
 The feature suite tests transforms for causality. The backtester gets the same
 treatment, in the same three steps:
 
-- **Structural audit** — `assert_no_leakage` recomputes the fold layout and
+- **Structural audit**: `assert_no_leakage` recomputes the fold layout and
   checks that every scored timestamp equals `origin + step` and lies strictly
   after the cutoff.
-- **Perturbation and truncation** — multiplying the future by 1.5, or cutting
+- **Perturbation and truncation**: multiplying the future by 1.5, or cutting
   the series off just after the first target, must leave the first fold's
   predictions byte-identical.
-- **Negative controls** — a `_Peeker` that indexes one row past its history
+- **Negative controls**: a `_Peeker` that indexes one row past its history
   must raise `IndexError`, and an `_Oracle` holding the full series must score
   MAE 0.0. If the harness could be fooled, these are what would fool it.
 

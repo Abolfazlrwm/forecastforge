@@ -11,10 +11,10 @@ The package lives in `src/forecastforge/features/`:
 
 | Module | Role |
 |---|---|
-| `frame.py` | `FeatureSet` — the container features are built in |
-| `transform.py` | `Transform` — the base class and its contract |
+| `frame.py` | `FeatureSet`, the container features are built in |
+| `transform.py` | `Transform`, the base class and its contract |
 | `builtins.py` | The seven built-in transforms |
-| `pipeline.py` | `FeaturePipeline` — ordered composition |
+| `pipeline.py` | `FeaturePipeline`, ordered composition |
 
 ## Why features need their own container
 
@@ -29,13 +29,13 @@ fact is a bug in disguise:
 - **Substituting zero** is indistinguishable from a real zero and biases every
   model that sees it.
 
-`FeatureSet` therefore keeps the strict guarantees that still apply — sorted
-unique `DatetimeIndex`, numeric finite non-null target — allows NaN in
+`FeatureSet` therefore keeps the strict guarantees that still apply (sorted
+unique `DatetimeIndex`, numeric finite non-null target), allows NaN in
 generated columns, and makes the warm-up an explicit number:
 
 ```python
 features = FeaturePipeline([Lag(5), MACD()]).apply(series)
-features.warmup  # 33 — leading rows that are not usable yet
+features.warmup  # 33: leading rows that are not usable yet
 features.is_complete  # False
 usable = features.drop_warmup()  # 471 rows, no NaN
 features.to_time_series()  # raises while any NaN remains
@@ -98,9 +98,9 @@ Causality is the property that makes a walk-forward backtest mean anything.
 A feature at row *t* may depend only on rows `<= t`. Three common mistakes all
 look reasonable and all leak:
 
-- `shift(-1)` — reading tomorrow's value.
-- A centred rolling window — averaging across the present.
-- A statistic over the whole sample, such as a global z-score — the past is
+- `shift(-1)`: reading tomorrow's value.
+- A centred rolling window: averaging across the present.
+- A statistic over the whole sample, such as a global z-score: the past is
   normalised with information from the future.
 
 The framework cannot enforce causality statically, so it is **verified**.
@@ -115,8 +115,8 @@ built-in transform:
 Truncation alone can be fooled by a transform that reads the future without
 changing magnitude, and perturbation alone can be fooled by one that only
 depends on series length, so both are needed. The harness is itself tested
-against three deliberately leaky transforms — a forward shift, a centred
-window, and a global z-score — so a regression in the harness fails loudly
+against three deliberately leaky transforms (a forward shift, a centred
+window, and a global z-score), so a regression in the harness fails loudly
 instead of quietly weakening the guarantee. A further test fails if a
 transform class is added without a leakage case.
 

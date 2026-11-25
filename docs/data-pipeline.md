@@ -2,7 +2,7 @@
 
 ## Purpose
 
-How ForecastForge ingests, validates, and exposes data — from a raw vendor
+How ForecastForge ingests, validates, and exposes data, from a raw vendor
 feed or a deterministic generator through to the validated container that
 feature engineering consumes.
 
@@ -56,7 +56,7 @@ _load_frame()  ->  slice to [start, end]  ->  validate  ->  TimeSeries
 
 `SyntheticSource` is the backbone of the test suite and every example. It
 generates a log-price random walk with constant drift, sinusoidal
-seasonality, gaussian noise, and optional structural regimes — so the same
+seasonality, gaussian noise, and optional structural regimes, so the same
 seed yields the identical series on any machine, in CI, and on a
 contributor's laptop.
 
@@ -83,7 +83,7 @@ is deliberate:
 
 The volatility of each period is therefore a vector rather than a scalar: a
 regime scales the noise, and the price path stays continuous. `level_shift`
-remains available for callers who explicitly want a discontinuity — for
+remains available for callers who explicitly want a discontinuity, for
 example to test how a model copes with a gap.
 
 The resulting per-period standard deviation must stay non-negative; a

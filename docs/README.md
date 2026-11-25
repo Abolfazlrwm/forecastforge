@@ -36,5 +36,5 @@ implemented, tested, and runnable.
 - Significant, hard-to-reverse design choices are recorded as an ADR in
   [`adr/`](adr/) rather than buried in prose elsewhere.
 - Each topic document follows the same structure: **Purpose**,
-  **Current Status**, **Planned Contents** — so readers can quickly tell
+  **Current Status**, **Planned Contents**, so readers can quickly tell
   what is real versus what is planned.

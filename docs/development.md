@@ -26,7 +26,7 @@ reads settings from. This section describes how it works today.
 ### Configuration Hierarchy
 
 Configuration is resolved from five layers, listed from **highest to
-lowest priority** — a value set in a higher layer always wins over the
+lowest priority**; a value set in a higher layer always wins over the
 same value set in a lower one:
 
 1. **Explicit keyword arguments** passed directly to `Settings(...)`.
@@ -41,7 +41,7 @@ same value set in a lower one:
    full list of supported variables). Loaded via `python-dotenv`
    through `pydantic-settings`; if no `.env` file exists, this layer is
    silently skipped.
-4. **TOML configuration files** — `configs/settings.toml` (the base
+4. **TOML configuration files**: `configs/settings.toml` (the base
    layer) merged with `configs/<environment>.toml` (an overlay that
    only needs to declare the keys that differ from the base). See
    [How Configuration Files Work](#how-configuration-files-work) below.
@@ -66,7 +66,7 @@ print(settings.environment, settings.batch_size, settings.data_dir)
 ```
 
 If you need to force re-parsing (for example, after changing an
-environment variable mid-process — mainly relevant in tests), use
+environment variable mid-process, mainly relevant in tests), use
 `reload_settings()` or `get_settings.cache_clear()`.
 
 ### How Configuration Files Work
@@ -85,7 +85,7 @@ into four sections:
 `configs/production.toml` are **overlays**: each only declares the keys
 that differ from `settings.toml`. The active overlay is chosen by the
 resolved deployment environment (see below) and is merged section by
-section on top of the base file — a key present in the overlay wins;
+section on top of the base file: a key present in the overlay wins;
 any key the overlay omits keeps its value from `settings.toml`.
 
 All relative paths in `[paths]` are resolved to absolute paths against
@@ -121,7 +121,7 @@ export FORECASTFORGE_DATA_DIR=/mnt/external/forecastforge-data
 ```
 
 See `.env.example` for the complete, documented list of supported
-variables — copy it to `.env` and uncomment what you need rather than
+variables; copy it to `.env` and uncomment what you need rather than
 exporting variables manually in every shell session.
 
 ### Related Utilities
@@ -129,22 +129,22 @@ exporting variables manually in every shell session.
 The `config` package also provides several utilities that sit alongside
 `Settings` rather than inside it:
 
-- **`forecastforge.config.paths`** — path resolution helpers
+- **`forecastforge.config.paths`**: path resolution helpers
   (`get_project_root`, `get_data_dir`, `resolve_path`, etc.) used to
   compute the absolute directories `Settings` exposes, and reusable
   anywhere else a project-relative path is needed.
-- **`forecastforge.config.runtime`** — `get_runtime_info()` returns a
+- **`forecastforge.config.runtime`**: `get_runtime_info()` returns a
   snapshot of the current execution context (Python version, OS,
   hostname, whether running under pytest/CI). This is distinct from the
   deployment environment above: it describes *what machine and process*
   ForecastForge is running as, not *which configuration profile* is
   active.
-- **`forecastforge.config.device`** — `detect_device()` /
+- **`forecastforge.config.device`**: `detect_device()` /
   `resolve_device()` provide a `DeviceType` abstraction (`cpu`, `cuda`,
   `mps`) over PyTorch's device APIs, without requiring PyTorch to be
   installed. `Settings.resolved_device()` is a convenience wrapper that
   resolves `settings.device_preference` this way.
-- **`forecastforge.config.seed`** — `set_seed(seed)` seeds Python's
+- **`forecastforge.config.seed`**: `set_seed(seed)` seeds Python's
   `random` module, NumPy's global RNG, and PyTorch's CPU/CUDA/MPS
   generators. NumPy is a core dependency; PyTorch is optional and is
   skipped when absent.
@@ -165,17 +165,17 @@ the target cannot silently break.
 The following sections of this guide remain unwritten until the
 corresponding functionality exists:
 
-- **Environment setup** — detailed walkthrough of `scripts/bootstrap.sh`
+- **Environment setup**: detailed walkthrough of `scripts/bootstrap.sh`
   / `scripts/bootstrap.ps1`, virtual environment management, and
   troubleshooting common setup issues.
-- **Running the quality gates** — detailed usage of `make lint`,
+- **Running the quality gates**: detailed usage of `make lint`,
   `make format`, `make typecheck`, `make test`, and `make run-precommit`,
   including how to interpret common failures.
-- **Working with data locally** — how to point ForecastForge at sample or
+- **Working with data locally**: how to point ForecastForge at sample or
   local datasets under `data/`.
-- **Debugging and profiling** — recommended tools and workflows once
+- **Debugging and profiling**: recommended tools and workflows once
   pipeline and model code exist.
-- **Release process** — how versions are cut, how `CHANGELOG.md` is
+- **Release process**: how versions are cut, how `CHANGELOG.md` is
   maintained, and how releases are published.
 
 This document will grow alongside the codebase; sections above will be
