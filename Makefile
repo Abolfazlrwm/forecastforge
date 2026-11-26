@@ -20,44 +20,44 @@ endif
 PIP ?= $(PYTHON) -m pip
 
 help: ## Show this help message.
-        @echo "ForecastForge developer commands:"
-        @echo ""
-        @grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}'
+	@echo "ForecastForge developer commands:"
+	@echo ""
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}'
 
 install: ## Install the package with development dependencies (editable).
-        $(PIP) install --upgrade pip
-        $(PIP) install -e ".[dev,docs]"
-        pre-commit install
+	$(PIP) install --upgrade pip
+	$(PIP) install -e ".[dev,docs]"
+	pre-commit install
 
 lint: ## Run Ruff lint checks (no changes applied).
-        $(PYTHON) -m ruff check .
+	$(PYTHON) -m ruff check .
 
 format: ## Auto-format code with Ruff (rewrites files).
-        $(PYTHON) -m ruff format .
-        $(PYTHON) -m ruff check . --fix
+	$(PYTHON) -m ruff format .
+	$(PYTHON) -m ruff check . --fix
 
 typecheck: ## Run MyPy static type checks in strict mode.
-        $(PYTHON) -m mypy src
+	$(PYTHON) -m mypy src
 
 test: ## Run the pytest suite with coverage.
-        $(PYTHON) -m pytest
+	$(PYTHON) -m pytest
 
 benchmark: ## Run the offline model benchmark and refresh docs/assets (needs .[models,viz]).
-        $(PYTHON) -m forecastforge.evaluation.benchmark
+	$(PYTHON) -m forecastforge.evaluation.benchmark
 
 benchmark-fast: ## Reduced benchmark for CI smoke checks (1 seed, short series, no plot).
-        $(PYTHON) -m forecastforge.evaluation.benchmark --fast --no-plot
+	$(PYTHON) -m forecastforge.evaluation.benchmark --fast --no-plot
 
 docs-build: ## Build the documentation site into site/ (needs .[docs]).
-        $(PYTHON) -m mkdocs build --strict --site-dir site
+	$(PYTHON) -m mkdocs build --strict --site-dir site
 
 docs-serve: ## Serve the documentation site locally at 127.0.0.1:8000.
-        $(PYTHON) -m mkdocs serve
+	$(PYTHON) -m mkdocs serve
 
 clean: ## Remove caches, build artifacts, and coverage output.
-        rm -rf .pytest_cache .mypy_cache .ruff_cache .coverage coverage.xml htmlcov
-        rm -rf build dist *.egg-info
-        find . -type d -name "__pycache__" -not -path "./.venv/*" -exec rm -rf {} +
+	rm -rf .pytest_cache .mypy_cache .ruff_cache .coverage coverage.xml htmlcov
+	rm -rf build dist *.egg-info
+	find . -type d -name "__pycache__" -not -path "./.venv/*" -exec rm -rf {} +
 
 run-precommit: ## Run all pre-commit hooks against the entire repository.
-        pre-commit run --all-files
+	pre-commit run --all-files
