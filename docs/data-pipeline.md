@@ -15,7 +15,7 @@ connector. Structural validation lives in `src/forecastforge/schemas/`.
 ## The data contract
 
 Every stage hands forward a
-[`TimeSeries`](../src/forecastforge/schemas/time_series.py): a
+[`TimeSeries`](https://github.com/Abolfazlrwm/forecastforge/blob/main/src/forecastforge/schemas/time_series.py): a
 `pandas.DataFrame` with a sorted, unique `DatetimeIndex`, a numeric target
 column, and any declared numeric covariates. `validate_frame` enforces this
 once at the boundary rather than trusting each downstream consumer to

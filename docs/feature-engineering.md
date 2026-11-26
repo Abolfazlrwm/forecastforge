@@ -3,7 +3,7 @@
 ## Purpose
 
 Turns a validated
-[`TimeSeries`](../src/forecastforge/schemas/time_series.py) into the numeric
+[`TimeSeries`](https://github.com/Abolfazlrwm/forecastforge/blob/main/src/forecastforge/schemas/time_series.py) into the numeric
 columns a forecasting model consumes, without ever letting information from
 the future into the past.
 

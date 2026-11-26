@@ -10,8 +10,8 @@ the day-to-day contributor workflow for ForecastForge.
 
 **Partially implemented.** The core developer workflow (environment
 setup, `make` targets, pre-commit, Conventional Commits) is summarized
-in the root [README.md](../README.md) and
-[CONTRIBUTING.md](../CONTRIBUTING.md). The **application configuration
+in the root [README.md](https://github.com/Abolfazlrwm/forecastforge/blob/main/README.md) and
+[CONTRIBUTING.md](https://github.com/Abolfazlrwm/forecastforge/blob/main/CONTRIBUTING.md). The **application configuration
 system** (`src/forecastforge/config/`) is implemented and documented in
 full below. Everything else in this guide (working with data locally,
 debugging pipeline/model code, the release process) remains a skeleton

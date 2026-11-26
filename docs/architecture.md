@@ -25,7 +25,7 @@ are built and tested; tracking, serving, monitoring, and orchestration are not.
 | Monitoring | `monitoring` | Placeholder |
 | Orchestration | `pipelines` | Placeholder |
 
-The root [README](../README.md) carries the target-architecture diagram, with
+The root [README](https://github.com/Abolfazlrwm/forecastforge/blob/main/README.md) carries the target-architecture diagram, with
 the implemented stages marked. Sections below will be filled in as each
 remaining stage is designed.
 
@@ -70,4 +70,4 @@ remaining stage is designed.
 - **Cross-cutting concerns**: logging, error handling, and versioning
   conventions used across components.
 
-See [docs/adr/](adr/) for the architectural decisions already made.
+See [docs/adr/](https://github.com/Abolfazlrwm/forecastforge/blob/main/docs/adr/) for the architectural decisions already made.

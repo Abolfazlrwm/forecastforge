@@ -1,0 +1,107 @@
+# MkDocs configuration for the ForecastForge documentation site.
+#
+# The site is published to GitHub Pages by .github/workflows/docs.yml on
+# every push to main. Local preview: `make docs-serve`.
+
+site_name: ForecastForge
+site_description: >-
+  An open-source time-series forecasting library with leakage-safe features,
+  walk-forward evaluation, and a reproducible benchmark.
+site_url: https://abolfazlrwm.github.io/forecastforge/
+repo_url: https://github.com/Abolfazlrwm/forecastforge
+repo_name: Abolfazlrwm/forecastforge
+edit_uri: edit/main/docs/
+
+# Fail the build on broken links so a moved page cannot ship silently.
+strict: true
+
+# README.md is the in-repository documentation index; the site has its own
+# landing page. ADR drafts stay review-only until they are accepted.
+exclude_docs: |
+  README.md
+
+theme:
+  name: material
+  features:
+    - content.code.copy
+    - navigation.sections
+    - navigation.top
+    - search.highlight
+  palette:
+    # Light and dark modes follow the reader's system preference.
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  icon:
+    repo: fontawesome/brands/github
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            # Resolve `forecastforge.*` from the source tree, so building the
+            # docs does not require a prior `pip install -e .`.
+            paths: ["src"]
+            docstring_style: sphinx
+            docstring_section_style: table
+            show_source: true
+            show_root_heading: true
+            show_signature_annotations: true
+            separate_signature: true
+            members_order: source
+            filters: ["!^_"]
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Architecture: architecture.md
+  - Data pipeline: data-pipeline.md
+  - Feature engineering: feature-engineering.md
+  - Model comparison: model-comparison.md
+  - Benchmark results: assets/benchmark_results.md
+  - Development: development.md
+  - Planned:
+      - Serving: serving.md
+      - Monitoring: monitoring.md
+  - Decisions:
+      - ADR 0001, src layout: adr/0001-use-src-layout.md
+  - API reference:
+      - Overview: api/overview.md
+      - Config: api/config.md
+      - Core: api/core.md
+      - Data: api/data.md
+      - Schemas: api/schemas.md
+      - Features: api/features.md
+      - Models: api/models.md
+      - Evaluation: api/evaluation.md
+
+copyright: Copyright &copy; 2026 ForecastForge contributors. MIT licensed.
