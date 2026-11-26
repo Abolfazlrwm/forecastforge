@@ -1,6 +1,7 @@
 # ForecastForge
 
 [![CI](https://github.com/Abolfazlrwm/forecastforge/actions/workflows/ci.yml/badge.svg)](https://github.com/Abolfazlrwm/forecastforge/actions/workflows/ci.yml)
+[![Docs](https://github.com/Abolfazlrwm/forecastforge/actions/workflows/docs.yml/badge.svg)](https://abolfazlrwm.github.io/forecastforge/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://www.python.org/downloads/)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-261230.svg)](https://github.com/astral-sh/ruff)
@@ -143,7 +144,7 @@ forecastforge/
 │       ├── pipelines/         # Pipeline orchestration (planned)
 │       └── schemas/           # Shared data/config schemas
 ├── tests/                     # Automated test suite (pytest)
-├── docs/                      # Project documentation
+├── docs/                      # Project documentation (also hosted on GitHub Pages)
 │   ├── architecture.md
 │   ├── development.md
 │   ├── data-pipeline.md
@@ -151,6 +152,7 @@ forecastforge/
 │   ├── model-comparison.md
 │   ├── serving.md
 │   ├── monitoring.md
+│   ├── api/                   # Generated API reference (mkdocstrings)
 │   └── adr/                   # Architectural Decision Records
 ├── pipelines/                 # Pipeline/orchestration definitions (future)
 ├── notebooks/                 # Exploratory notebooks (not for production code)
@@ -175,6 +177,7 @@ forecastforge/
 ├── models/                    # Serialized model artifacts (git-ignored)
 ├── mlruns/                    # Experiment tracking store (git-ignored)
 ├── pyproject.toml             # Packaging, dependency, and tool configuration
+├── mkdocs.yml                 # Documentation site configuration (Material)
 ├── Makefile                   # Common developer workflows
 ├── docker-compose.yml         # Local service orchestration (placeholder)
 ├── .pre-commit-config.yaml    # Pre-commit hook configuration
@@ -182,6 +185,7 @@ forecastforge/
 ├── CODE_OF_CONDUCT.md         # Contributor Covenant v2.1
 ├── SECURITY.md                # Vulnerability reporting process
 ├── CHANGELOG.md               # Keep a Changelog-formatted history
+├── CITATION.cff               # Citation metadata (GitHub "Cite this repository")
 └── VERSION                    # Current project version
 ```
 
@@ -254,6 +258,10 @@ today:
   `[models]` extra so the optional-model tests really run, then building the
   wheel and importing it in a clean virtual environment, on every push and
   pull request.
+- A documentation site (Material for MkDocs) built in strict mode and
+  published to [GitHub Pages](https://abolfazlrwm.github.io/forecastforge/)
+  on every push to main, with a per-module API reference generated from the
+  docstrings.
 - Pre-commit hooks, Dependabot, YAML issue forms, a pull request
   template, and community health files (`CONTRIBUTING.md`,
   `CODE_OF_CONDUCT.md`, `SECURITY.md`, `CHANGELOG.md`).
@@ -350,6 +358,17 @@ result = WalkForwardBacktester(BacktestConfig(initial_train=252, horizon=1)).run
 print(result.summary())
 ```
 
+The third demo backtests the four dependency-free baselines over the same
+series used by the other examples, fifty expanding folds with a five-row
+horizon and a one-row embargo, and prints the metrics table plus the fold
+layout:
+
+```bash
+python examples/03_backtesting.py
+```
+
+![Fold layout of the walk-forward backtest and the MASE of each baseline against naive parity](docs/assets/backtest_overview.png)
+
 `make benchmark` compares every installed model over five deterministic
 2000-day paths and writes [`docs/assets/benchmark_results.md`](docs/assets/benchmark_results.md)
 and the figure below:
@@ -378,6 +397,13 @@ What this demonstrates:
 
 Everything beyond model evaluation (CLI, tracking, serving, containers,
 monitoring: phases 4–9) is planned and not yet implemented.
+
+## Citing ForecastForge
+
+If ForecastForge contributes to work you publish, please cite it. The
+repository carries [CITATION.cff](CITATION.cff), so GitHub renders a
+"Cite this repository" button with the versioned metadata, and Zenodo or
+other archivers can consume the same file.
 
 ## Development Workflow
 
@@ -409,6 +435,8 @@ Day-to-day commands, all defined in the [Makefile](Makefile):
 | `make typecheck` | Run MyPy in strict mode |
 | `make test` | Run the pytest suite with coverage |
 | `make benchmark` | Run the offline model benchmark and refresh `docs/assets/` (needs `[models,viz]`) |
+| `make docs-build` | Build the documentation site into `site/` (needs `[docs]`) |
+| `make docs-serve` | Serve the documentation site locally at 127.0.0.1:8000 |
 | `make run-precommit` | Run all pre-commit hooks against the whole repo |
 | `make clean` | Remove caches, build artifacts, and coverage output |
 

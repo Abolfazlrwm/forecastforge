@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-26
+
+### Added
+
+- A hosted documentation site: `mkdocs.yml` (Material for MkDocs, built in
+  strict mode) with a landing page (`docs/index.md`) and per-module API
+  reference pages under `docs/api/` generated from the docstrings. A new
+  workflow (`.github/workflows/docs.yml`) builds and publishes the site to
+  GitHub Pages on every push to main, and `make docs-build` / `make
+  docs-serve` wrap the local workflow. The build fails on broken links, so a
+  moved page cannot ship silently.
+- `examples/03_backtesting.py`: a walk-forward backtest of the four
+  dependency-free baselines over the same 504-day synthetic series as the
+  other demos (50 expanding folds, a five-row horizon, a one-row embargo),
+  printing the per-model metrics table and plotting the fold layout next to
+  the resulting MASE scores (`docs/assets/backtest_overview.png`).
+- `CITATION.cff`, so GitHub renders a "Cite this repository" button and
+  archivers can consume the versioned metadata.
+- The `Programming Language :: Python :: 3.13` classifier in the wheel
+  metadata, matching what CI actually tests.
+
+### Changed
+
+- GitHub releases are now built from the tagged version's `CHANGELOG.md`
+  section instead of a generic pointer at the file. A version bump without a
+  changelog section, or with an empty one, fails the release workflow rather
+  than publishing empty notes.
+- Five repository-relative links in `docs/` (`../README.md`,
+  `../CONTRIBUTING.md`, and two source files) resolved on GitHub but broke
+  on the deployed documentation site; they now point at `blob/main` URLs,
+  which work in both places.
+
 ## [0.1.1] - 2026-11-25
 
 ### Added
@@ -189,6 +221,7 @@ community health files.
 - The Makefile and pre-commit config hardcoded a `python3.12` interpreter;
   both now detect the virtualenv interpreter and fall back to `python`.
 
-[Unreleased]: https://github.com/Abolfazlrwm/forecastforge/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/Abolfazlrwm/forecastforge/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/Abolfazlrwm/forecastforge/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/Abolfazlrwm/forecastforge/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/Abolfazlrwm/forecastforge/releases/tag/v0.1.0
