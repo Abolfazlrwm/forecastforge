@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+title: ForecastForge
+message: >-
+  If you use ForecastForge in your work, please cite it using this
+  metadata and the version you used.
+type: software
+authors:
+  - name: ForecastForge Contributors
+    website: "https://github.com/Abolfazlrwm/forecastforge"
+description: >-
+  An open-source time-series forecasting library with leakage-safe feature
+  engineering, a leakage-safe walk-forward backtester, and a reproducible
+  benchmark of baseline and statistical models on deterministic data.
+keywords:
+  - forecasting
+  - time-series
+  - backtesting
+  - data-leakage
+  - machine-learning
+license: MIT
+repository-code: "https://github.com/Abolfazlrwm/forecastforge"
+version: "0.2.0"
+date-released: "2026-11-26"
