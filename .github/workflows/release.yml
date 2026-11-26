@@ -70,6 +70,37 @@ jobs:
           print(f"wheel import OK: {forecastforge.__version__}")
           PY
 
+      - name: Extract the changelog section for this release
+        # The release body comes from CHANGELOG.md, not a hand-written
+        # workflow string, so the notes stay in one reviewed file. If the
+        # version has no section yet (a bump that forgot the changelog), the
+        # step fails rather than publishing empty notes.
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          version = "${{ github.ref_name }}".removeprefix("v")
+          text = Path("CHANGELOG.md").read_text(encoding="utf-8")
+
+          marker = f"## [{version}]"
+          start = text.find(marker)
+          if start == -1:
+              raise SystemExit(
+                  f"CHANGELOG.md has no section for {version}; "
+                  "add one before tagging the release"
+              )
+          # Skip to the end of the heading line so the release date after the
+          # bracketed version does not leak into the body.
+          body_start = text.index("\n", start) + 1
+          next_heading = text.find("\n## [", body_start)
+          body = text[body_start:next_heading].strip() if next_heading != -1 else text[body_start:].strip()
+          if not body:
+              raise SystemExit(f"the CHANGELOG.md section for {version} is empty")
+
+          Path("release_notes.md").write_text(body + "\n", encoding="utf-8")
+          print(f"extracted {len(body.splitlines())} lines of release notes for {version}")
+          PY
+
       - name: Upload the distribution to the release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -77,5 +108,5 @@ jobs:
           gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 \
             || gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" \
                  --title "ForecastForge $GITHUB_REF_NAME" \
-                 --notes "See CHANGELOG.md for what changed in this release."
+                 --notes-file release_notes.md
           gh release upload "$GITHUB_REF_NAME" dist/* --repo "$GITHUB_REPOSITORY" --clobber
